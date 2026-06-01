@@ -1,0 +1,100 @@
+---
+description: NeoDMS / Neo Drive architecture, routes, and development conventions
+alwaysApply: true
+---
+
+# NeoDMS Project Context
+
+## What This Repo Is
+
+**NeoDMS_v1** is a **Next.js 16 + React 19** document-management UI (**Ospyn Neo My Drive**), built on the Ospyn multi-layout template.
+
+- **Primary product shell:** `(with-sidebar)` — dark sidebar, drive header, `#f9fafb` main surface (`.drive-shell`).
+- **Default home:** `/` → `DriveDashboardPage` (greeting, Quick access, Recent Files).
+- **Frontend-only:** mock data in `features/drive/` and `features/dashboard/`; no API, auth, or DB yet.
+- **Template shells preserved:** `(with-header)`, `(minimal)`, `/ui-showcase` — do not remove when extending drive.
+
+Branding & user chrome: `config/app.ts` (`productName`, `driveName`, `userDisplayName`, `workspaceName`, storage GB).
+
+## Stack
+
+Next.js App Router (Turbopack) · React 19 · shadcn (`radix-nova`) · Tailwind v4 · pnpm · ESLint · Prettier · strict TS · CI on `main`/PR.
+
+## Folder Map
+
+```text
+app/
+  (with-sidebar)/           # Neo Drive — DEFAULT PRODUCT
+    page.tsx                # /  → DriveDashboardPage
+    sample-sidebar/         # legacy paths + feature routes
+      documents/            # Owned by me → FileExplorerPage
+  (with-header)/            # Template demo (separate nav)
+  (minimal)/                # Upload, onboarding demos
+components/
+  layout/                   # app-sidebar, documents-app-header, *-layout
+  ui/                       # shadcn primitives (reuse-first)
+features/
+  drive/                    # Dashboard, explorer, mock data — PRIMARY FEATURE
+  dashboard/                # Legacy requests/neo-table (with-header /demo)
+  upload/                   # Document upload flows
+  showcase/                 # /ui-showcase
+config/
+  app.ts                    # Branding
+  nav/sidebar-nav.ts        # Drive sidebar IA (source of truth)
+docs/                       # PROJECT_OVERVIEW, ROUTING, DRIVE_UI, TABLE, TYPOGRAPHY
+```
+
+## Golden Rules
+
+1. Thin `app/**/page.tsx` — compose `features/<feature>/components`.
+2. Drive chrome in `components/layout/` (`AppSidebar`, `DocumentsAppHeader`), not in features.
+3. New drive UI under `features/drive/`; do not put drive-only logic in `components/ui/`.
+4. Follow `ui-component-governance.mdc` before new `components/ui/*` primitives.
+5. Tables: `docs/TABLE_BEHAVIOR_GUIDE.md`. Drive visuals: `docs/DRIVE_UI_GUIDE.md`.
+
+## Neo Drive Routes (`(with-sidebar)`)
+
+| URL | Page / component |
+|-----|------------------|
+| `/` | `DriveDashboardPage` |
+| `/sample-sidebar/documents` | `FileExplorerPage` (Owned by me) |
+| `/sample-sidebar/shared-with-me` | placeholder |
+| `/sample-sidebar/shared-by-me` | placeholder |
+| `/sample-sidebar/quick-access` | placeholder |
+| `/sample-sidebar/recent` | placeholder |
+| `/sample-sidebar/trash` | placeholder |
+| `/sample-sidebar/settings` | settings + ThemeManager |
+| `/sample-sidebar` | redirects → `/` |
+| `/sample-sidebar/templates`, `/archive` | legacy `SectionPage` (not in sidebar nav) |
+
+## Sidebar Nav (`config/nav/sidebar-nav.ts`)
+
+Dashboard · Owned by me · Shared with me · Shared by me · Quick access · Recent · Trash · **Settings** (footer, separate from main list).
+
+Edit nav here only; header titles sync via `documents-app-header.tsx` `ROUTE_TITLES`.
+
+## Layout Scoping
+
+- `SidebarHeaderLayout` with `driveShell` in `app/(with-sidebar)/layout.tsx` applies `.drive-shell` CSS tokens (`app/globals.css`).
+- Do **not** apply `.drive-shell` to `(with-header)` or `(minimal)` unless intentionally rebranding those demos.
+
+## Template / Legacy (unchanged on purpose)
+
+| Shell | Examples | Notes |
+|-------|----------|--------|
+| `(with-header)` | `/dashboard`, `/documents`, `/ui-showcase` | Separate `header-nav.ts`; requests `NeoTable` on `/dashboard` |
+| `(minimal)` | `/learn-minimal`, `/document-upload` | No sidebar |
+
+## Adding Drive Work
+
+1. UI in `features/drive/components/`; mock data in `features/drive/data/`.
+2. Register route under `app/(with-sidebar)/…` and `sidebar-nav.ts` + `ROUTE_TITLES`.
+3. Use existing drive patterns: `QuickAccessSection`, `FileExplorerPage`, `DrivePlaceholderPage`.
+4. Swap mocks for hooks/API later without changing route files.
+
+## Commands
+
+```bash
+pnpm install && pnpm dev    # http://localhost:3000/ → dashboard
+pnpm typecheck && pnpm lint && pnpm build
+```

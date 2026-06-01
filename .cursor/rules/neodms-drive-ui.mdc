@@ -1,0 +1,62 @@
+---
+description: Neo Drive UI patterns — sidebar, dashboard, explorer (match Figma)
+globs: features/drive/**/*,components/layout/app-sidebar.tsx,components/layout/documents-app-header.tsx,app/(with-sidebar)/**/*
+alwaysApply: false
+---
+
+# Neo Drive UI Rules
+
+Apply when editing drive layout, dashboard, or explorer. Match the **Ospyn Neo My Drive** design system.
+
+## Design Tokens (`.drive-shell` in `app/globals.css`)
+
+| Token | Value / usage |
+|-------|----------------|
+| `--drive-surface` | `#f9fafb` — main content background |
+| `--drive-quick-access` | `#f2f4f7` — quick access card fill |
+| `--drive-link` | `#008542` — “View more”, upgrade links |
+| `--drive-search-bg` | `#eef4fb` — header search (`.drive-search-input`) |
+| Sidebar | `#0b121e` via `--sidebar` overrides |
+| Active nav | `--sidebar-accent` / `--sidebar-accent-foreground` (green on dark) |
+
+Use utility classes: `drive-main`, `drive-quick-access-card`, `drive-link`, `drive-search-input`.
+
+## Typography (see `docs/TYPOGRAPHY_GUIDE.md`)
+
+- Page greeting: `text-2xl font-semibold tracking-tight`
+- Section titles: `text-base font-semibold`
+- Nav / body: `text-sm`; meta: `text-xs text-muted-foreground`
+
+## Sidebar (`AppSidebar`)
+
+- Logo block: green “O” tile + `productName` (small) + `driveName` (bold)
+- **WORKSPACE** label + `workspaceName` button with gem icon
+- Main nav from `getSidebarNavItems()`; active = green accent on dark
+- **Settings** above storage widget (not in main list)
+- Storage: progress + “Upgrade Storage” (`appConfig.storageUsedGb` / `storageTotalGb`)
+
+## Header (`DocumentsAppHeader`)
+
+- Left: `SidebarTrigger` + page title from `ROUTE_TITLES` / active nav
+- Center: pill search — placeholder **“Search in Neo Drive”**, Clear when typing
+- Right: Sparkles, Bell (red dot), Help, Grid, user avatar + name/email from `appConfig`
+
+Do not add upload CTA to header; **+ New** belongs on file explorer toolbar only.
+
+## Dashboard (`DriveDashboardPage`)
+
+- `QuickAccessSection`: 2×5 grid (`xl:grid-cols-5`), cards 60px tall, `#f2f4f7`
+- Folder icon: blue folder + centered white star (`QuickAccessItemIcon`)
+- Files: blue “W” tile (docx), red “PDF” tile
+- `Recent Files`: white bordered cards, preview block, optional HR/Finance tag, timestamp footer
+
+## File Explorer (`FileExplorerPage`)
+
+- Breadcrumbs → toolbar (folder search + sort/filter/view + **+ New**) → `FileExplorerTable` embedded in one white card
+- Table: use `TableContainer` / `TableSortHead` / `data-state="selected"` per `TABLE_BEHAVIOR_GUIDE.md`
+
+## Do Not
+
+- Reintroduce e-stamp “Upgrade Pro” card in sidebar footer (use storage meter).
+- Use `neo-table` / `request-row` for drive file lists.
+- Change `(with-header)` `/dashboard` when implementing drive — that is a separate template demo.

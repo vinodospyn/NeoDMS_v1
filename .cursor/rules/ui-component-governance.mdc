@@ -1,0 +1,37 @@
+---
+description: Enforce reuse-first UI component development
+alwaysApply: true
+---
+
+# UI Component Governance
+
+Use existing primitives from `components/ui/*` first. Prefer composition over creating new shared primitives.
+
+## Reuse-First Workflow
+
+1. Before building UI, check whether the needed primitive already exists in `components/ui/*`.
+2. If it exists, use it directly or compose it in `features/<feature>/components/*`.
+3. Do not create a new file in `components/ui/*` when an existing primitive can satisfy the requirement.
+
+## New Primitive Gate
+
+Create a new shared primitive in `components/ui/*` only when all are true:
+
+- No existing component can cover the requirement without hacks.
+- The need is reusable across multiple features/pages.
+- You explicitly ask for confirmation before creating the new primitive.
+
+When confirmation is needed, ask:
+"No suitable existing `components/ui/*` primitive found. Do you want me to create a new shared component in `components/ui/`?"
+
+## Neo Drive vs Primitives
+
+- Drive-specific layouts (sidebar, dashboard cards, explorer toolbar) belong in `features/drive/` or `components/layout/`, not new `components/ui/*` files.
+- Shared table styling uses `components/ui/table.tsx` (`TableContainer`, `TableSortHead`, etc.) — see `docs/TABLE_BEHAVIOR_GUIDE.md`.
+- Drive colors/spacing: `docs/DRIVE_UI_GUIDE.md` and `.drive-shell` tokens in `app/globals.css`.
+
+## Styling and Consistency
+
+- Keep theme consistency by using existing tokens, variants, and utility patterns.
+- Avoid one-off visual systems or duplicate component APIs.
+- Prefer updating existing variants over introducing near-duplicate primitives.
