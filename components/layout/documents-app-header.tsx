@@ -5,13 +5,13 @@ import { usePathname } from "next/navigation"
 import {
   Bell,
   ChevronDown,
-  CircleHelp,
-  LayoutGrid,
+  Palette,
   Search,
   Sparkles,
   X,
 } from "lucide-react"
 
+import { ThemeManager } from "@/components/theme-manager"
 import { appConfig } from "@/config/app"
 import { getSidebarNavItems } from "@/config/nav/resolver"
 import { sidebarSettingsNavItem } from "@/config/nav/sidebar-nav"
@@ -142,26 +142,19 @@ function HeaderActions({
         <Bell className="size-4" />
         <span className="absolute top-1.5 right-1.5 size-1.5 rounded-full bg-rose-500" />
       </Button>
-      <Button
-        type="button"
-        variant="ghost"
-        size="icon-sm"
-        className="text-muted-foreground"
-        aria-label="Help"
-      >
-        <CircleHelp className="size-4" />
-      </Button>
-      {!compact ? (
-        <Button
-          type="button"
-          variant="ghost"
-          size="icon-sm"
-          className="text-muted-foreground"
-          aria-label="Applications"
-        >
-          <LayoutGrid className="size-4" />
-        </Button>
-      ) : null}
+      <ThemeManager
+        trigger={
+          <Button
+            type="button"
+            variant="ghost"
+            size="icon-sm"
+            className="text-muted-foreground"
+            aria-label="Theme settings"
+          >
+            <Palette className="size-4" />
+          </Button>
+        }
+      />
       <button
         type="button"
         className="ml-1 flex items-center gap-2 rounded-full border border-transparent p-1 text-left transition-colors hover:bg-muted/50 lg:pl-1"

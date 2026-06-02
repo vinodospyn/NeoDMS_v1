@@ -3,6 +3,8 @@
 import * as React from "react"
 import { ThemeProvider as NextThemesProvider, useTheme } from "next-themes"
 
+import { ThemePreferencesHydrator } from "@/components/theme-preferences-hydrator"
+
 function ThemeProvider({
   children,
   ...props
@@ -16,6 +18,7 @@ function ThemeProvider({
       disableTransitionOnChange
       {...props}
     >
+      <ThemePreferencesHydrator />
       <ThemeHotkey />
       {children}
     </NextThemesProvider>

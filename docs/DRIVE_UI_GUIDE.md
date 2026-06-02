@@ -20,7 +20,8 @@ Drive styling is scoped via `.drive-shell` on `SidebarProvider` (`app/(with-side
 | Quick access cards | `--drive-quick-access` `#f2f4f7` · `.drive-quick-access-card` |
 | Primary links | `--drive-link` `#008542` · `.drive-link` |
 | Search field | `--drive-search-bg` `#eef4fb` · `.drive-search-input` |
-| Sidebar background | `#0b121e` (sidebar CSS variables under `.drive-shell`) |
+| Sidebar background (light) | White + slate text under `:root:not(.dark):not(.semi-dark) .drive-shell` |
+| Sidebar background (dark / semi-dark) | `#0b121e` under `.dark .drive-shell` / `.semi-dark .drive-shell` |
 | Active nav item | Dark green fill + bright green text/icon |
 
 ## Spacing

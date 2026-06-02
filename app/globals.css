@@ -495,20 +495,42 @@
 
 }
 
-/* Neo Drive shell — scoped to (with-sidebar) layout only */
+/* Neo Drive shell — layout surfaces only; accent comes from html[data-accent] */
 .drive-shell {
   --drive-surface: #f9fafb;
   --drive-quick-access: #f2f4f7;
-  --drive-link: #008542;
   --drive-search-bg: #eef4fb;
+}
+
+/* Light theme — light sidebar shell; primary/accent follow selected palette */
+:root:not(.dark):not(.semi-dark) .drive-shell {
+  --sidebar: #ffffff;
+  --sidebar-foreground: #0f172a;
+  --sidebar-border: #e2e8f0;
+  --sidebar-accent: color-mix(in oklch, var(--primary) 14%, white);
+  --sidebar-accent-foreground: var(--primary);
+  --sidebar-ring: color-mix(in oklch, var(--primary) 32%, transparent);
+}
+
+.dark .drive-shell {
+  --drive-surface: #0f172a;
+  --drive-quick-access: #1e293b;
+  --drive-search-bg: #1e293b;
   --sidebar: #0b121e;
   --sidebar-foreground: #f1f5f9;
-  --sidebar-primary: #22c55e;
-  --sidebar-primary-foreground: #ecfdf5;
-  --sidebar-accent: #14352b;
-  --sidebar-accent-foreground: #4ade80;
   --sidebar-border: rgb(255 255 255 / 10%);
-  --sidebar-ring: rgb(74 222 128 / 40%);
+  --sidebar-accent: color-mix(in oklch, var(--primary) 24%, #0b121e);
+  --sidebar-accent-foreground: var(--primary);
+  --sidebar-ring: color-mix(in oklch, var(--primary) 42%, transparent);
+}
+
+.semi-dark .drive-shell {
+  --sidebar: #0b121e;
+  --sidebar-foreground: #f1f5f9;
+  --sidebar-border: rgb(255 255 255 / 10%);
+  --sidebar-accent: color-mix(in oklch, var(--primary) 24%, #0b121e);
+  --sidebar-accent-foreground: var(--primary);
+  --sidebar-ring: color-mix(in oklch, var(--primary) 42%, transparent);
 }
 
 .drive-shell .drive-main {
@@ -527,9 +549,9 @@
 }
 
 .drive-shell .drive-link {
-  color: var(--drive-link);
+  color: var(--primary);
 }
 
 .drive-shell .drive-link:hover {
-  color: #006b35;
+  color: color-mix(in oklch, var(--primary) 85%, black);
 }

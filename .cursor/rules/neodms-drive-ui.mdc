@@ -16,7 +16,8 @@ Apply when editing drive layout, dashboard, or explorer. Match the **Ospyn Neo M
 | `--drive-quick-access` | `#f2f4f7` — quick access card fill |
 | `--drive-link` | `#008542` — “View more”, upgrade links |
 | `--drive-search-bg` | `#eef4fb` — header search (`.drive-search-input`) |
-| Sidebar | `#0b121e` via `--sidebar` overrides |
+| Sidebar (light) | White sidebar via `:root:not(.dark):not(.semi-dark) .drive-shell` |
+| Sidebar (dark / semi-dark) | `#0b121e` via `.dark .drive-shell` / `.semi-dark .drive-shell` |
 | Active nav | `--sidebar-accent` / `--sidebar-accent-foreground` (green on dark) |
 
 Use utility classes: `drive-main`, `drive-quick-access-card`, `drive-link`, `drive-search-input`.
@@ -39,9 +40,9 @@ Use utility classes: `drive-main`, `drive-quick-access-card`, `drive-link`, `dri
 
 - Left: `SidebarTrigger` + page title from `ROUTE_TITLES` / active nav
 - Center: pill search — placeholder **“Search in Neo Drive”**, Clear when typing
-- Right: Sparkles, Bell (red dot), Help, Grid, user avatar + name/email from `appConfig`
+- Right: Sparkles, Bell (red dot), **Palette** (opens `ThemeManager` sheet), user avatar + name/email from `appConfig`
 
-Do not add upload CTA to header; **+ New** belongs on file explorer toolbar only.
+Do not add upload CTA to header; **+ New** belongs on file explorer toolbar only. Theme controls: navbar Palette icon or Settings page.
 
 ## Dashboard (`DriveDashboardPage`)
 

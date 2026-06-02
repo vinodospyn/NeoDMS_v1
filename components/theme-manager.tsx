@@ -26,19 +26,25 @@ import {
 } from "@/components/ui/sheet"
 import { Separator } from "@/components/ui/separator"
 import { cn } from "@/lib/utils"
+import {
+  applyThemeAccent,
+  applyThemeMotion,
+  applyThemeRadius,
+  applyThemeScale,
+  persistThemePreference,
+  readStoredThemeValue,
+  THEME_STORAGE_KEYS,
+  type ThemeAccent,
+  type ThemeMotion,
+  type ThemeRadius,
+  type ThemeScale,
+} from "@/lib/theme-preferences"
 
 type ThemeMode = "light" | "dark" | "semi-dark" | "system"
-type Accent = "slate" | "emerald" | "navy" | "amethyst" | "teal" | "zinc"
-type Radius = "default" | "comfortable" | "compact"
-type Motion = "default" | "reduced"
-type Scale = "sm" | "md" | "lg"
-
-const STORAGE_KEYS = {
-  accent: "app-accent",
-  radius: "app-radius",
-  motion: "app-motion",
-  scale: "app-scale",
-} as const
+type Accent = ThemeAccent
+type Radius = ThemeRadius
+type Motion = ThemeMotion
+type Scale = ThemeScale
 
 const ACCENT_OPTIONS: Array<{ id: Accent; previewClass: string; glowClass: string }> = [
   { id: "slate", previewClass: "bg-slate-500", glowClass: "shadow-slate-500/50" },
@@ -92,63 +98,45 @@ const MODE_OPTIONS = [
   },
 ]
 
-function readStoredValue<T extends string>(key: string, allowed: readonly T[], fallback: T): T {
-  if (typeof window === "undefined") {
-    return fallback
-  }
-
-  const rawValue = window.localStorage.getItem(key)
-  if (rawValue && allowed.includes(rawValue as T)) {
-    return rawValue as T
-  }
-
-  return fallback
-}
-
-function persistPreference(key: string, value: string) {
-  window.localStorage.setItem(key, value)
-  document.cookie = `${key}=${value}; Path=/; Max-Age=31536000; SameSite=Lax`
-}
-
-function applyAccent(accent: Accent) {
-  document.documentElement.dataset.accent = accent
-}
-
-function applyRadius(radius: Radius) {
-  document.documentElement.dataset.radius = radius
-}
-
-function applyMotion(motion: Motion) {
-  document.documentElement.dataset.motion = motion
-}
-
-function applyScale(scale: Scale) {
-  document.documentElement.dataset.scale = scale
-}
-
 export function ThemeManager({ trigger }: { trigger: React.ReactNode }) {
   const { theme, setTheme, resolvedTheme } = useTheme()
   const [accent, setAccent] = React.useState<Accent>(() =>
-    readStoredValue<Accent>(STORAGE_KEYS.accent, ACCENT_OPTIONS.map((item) => item.id), "emerald")
+    readStoredThemeValue<Accent>(
+      THEME_STORAGE_KEYS.accent,
+      ACCENT_OPTIONS.map((item) => item.id),
+      "emerald"
+    )
   )
   const [radius, setRadius] = React.useState<Radius>(() =>
-    readStoredValue<Radius>(STORAGE_KEYS.radius, RADIUS_OPTIONS.map((item) => item.id), "default")
+    readStoredThemeValue<Radius>(
+      THEME_STORAGE_KEYS.radius,
+      RADIUS_OPTIONS.map((item) => item.id),
+      "default"
+    )
   )
   const [motion, setMotion] = React.useState<Motion>(() =>
-    readStoredValue<Motion>(STORAGE_KEYS.motion, ["default", "reduced"], "default")
+    readStoredThemeValue<Motion>(
+      THEME_STORAGE_KEYS.motion,
+      ["default", "reduced"],
+      "default"
+    )
   )
   const [scale, setScale] = React.useState<Scale>(() =>
-    readStoredValue<Scale>(STORAGE_KEYS.scale, SCALE_OPTIONS.map((item) => item.id), "md")
+    readStoredThemeValue<Scale>(
+      THEME_STORAGE_KEYS.scale,
+      SCALE_OPTIONS.map((item) => item.id),
+      "md"
+    )
   )
   React.useEffect(() => {
-    applyAccent(accent)
-    applyRadius(radius)
-    applyMotion(motion)
-    applyScale(scale)
-    persistPreference(STORAGE_KEYS.accent, accent)
-    persistPreference(STORAGE_KEYS.radius, radius)
-    persistPreference(STORAGE_KEYS.motion, motion)
-    persistPreference(STORAGE_KEYS.scale, scale)
+    applyThemeAccent(accent)
+    applyThemeRadius(radius)
+    applyThemeMotion(motion)
+    applyThemeScale(scale)
+    persistThemePreference(THEME_STORAGE_KEYS.accent, accent)
+    persistThemePreference(THEME_STORAGE_KEYS.radius, radius)
+    persistThemePreference(THEME_STORAGE_KEYS.motion, motion)
+    persistThemePreference(THEME_STORAGE_KEYS.scale, scale)
   }, [accent, motion, radius, scale])
 
   function onAccentChange(nextAccent: Accent) {

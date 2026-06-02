@@ -38,40 +38,40 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   return (
     <Sidebar
       collapsible="icon"
-      className="[--sidebar-width-icon:3.75rem] border-r-0"
+      className="border-r-0 [--sidebar-width-icon:3.75rem]"
       {...props}
     >
       <SidebarHeader className="gap-3 px-3 py-4">
         <div className="flex items-start gap-2.5 group-data-[collapsible=icon]:justify-center">
-          <div className="flex size-9 shrink-0 items-center justify-center rounded-lg bg-[#008542] text-sm font-bold text-white">
+          <div className="flex size-9 shrink-0 items-center justify-center rounded-lg bg-primary text-sm font-bold text-primary-foreground">
             O
           </div>
           <div className="min-w-0 group-data-[collapsible=icon]:hidden">
             <p className="text-xs leading-none text-sidebar-foreground/60">
               {appConfig.productName}
             </p>
-            <p className="mt-0.5 truncate text-base font-semibold leading-tight text-sidebar-foreground">
+            <p className="mt-0.5 truncate text-base leading-tight font-semibold text-sidebar-foreground">
               {appConfig.driveName}
             </p>
           </div>
         </div>
 
-        <div className="group-data-[collapsible=icon]:hidden">
+        {/* <div className="group-data-[collapsible=icon]:hidden">
           <SidebarGroupLabel className="mb-1.5 px-0 text-[10px] font-semibold tracking-wider text-sidebar-foreground/45 uppercase">
             Workspace
           </SidebarGroupLabel>
           <Button
             type="button"
             variant="outline"
-            className="h-10 w-full justify-start gap-2 rounded-xl border-sidebar-border/80 bg-white/5 px-3 text-sm font-medium text-sidebar-foreground hover:bg-white/10 hover:text-sidebar-foreground"
+            className="h-10 w-full justify-start gap-2 rounded-xl border-sidebar-border bg-sidebar-accent/40 px-3 text-sm font-medium text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground"
           >
-            <Gem className="size-4 shrink-0 text-[#4ade80]" aria-hidden />
+            <Gem className="size-4 shrink-0 text-primary" aria-hidden />
             <span className="truncate">{appConfig.workspaceName}</span>
           </Button>
-        </div>
+        </div> */}
       </SidebarHeader>
 
-      <SidebarContent className="px-2">
+      <SidebarContent className="py-4">
         <SidebarGroup className="py-0">
           <SidebarGroupContent>
             <SidebarMenu className="gap-0.5">
@@ -82,8 +82,8 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                     isActive={isNavItemActive(pathname, item.href)}
                     tooltip={item.label}
                     className={cn(
-                      "h-10 rounded-lg px-3 text-sm font-medium text-sidebar-foreground/85",
-                      "hover:bg-white/8 hover:text-sidebar-foreground",
+                      "h-10 rounded-lg px-3 text-sm font-medium text-sidebar-foreground/90",
+                      "hover:bg-sidebar-accent hover:text-sidebar-accent-foreground",
                       "data-[active=true]:bg-sidebar-accent data-[active=true]:text-sidebar-accent-foreground data-[active=true]:shadow-none"
                     )}
                   >
@@ -112,14 +112,11 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
           <SidebarMenuItem>
             <SidebarMenuButton
               asChild
-              isActive={isNavItemActive(
-                pathname,
-                sidebarSettingsNavItem.href
-              )}
+              isActive={isNavItemActive(pathname, sidebarSettingsNavItem.href)}
               tooltip={sidebarSettingsNavItem.label}
               className={cn(
-                "h-10 rounded-lg px-3 text-sm font-medium text-sidebar-foreground/85",
-                "hover:bg-white/8 hover:text-sidebar-foreground",
+                "h-10 rounded-lg px-3 text-sm font-medium text-sidebar-foreground/90",
+                "hover:bg-sidebar-accent hover:text-sidebar-accent-foreground",
                 "data-[active=true]:bg-sidebar-accent data-[active=true]:text-sidebar-accent-foreground"
               )}
             >
@@ -133,18 +130,18 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
           </SidebarMenuItem>
         </SidebarMenu>
 
-        <div className="rounded-xl border border-sidebar-border/80 bg-white/5 p-3 group-data-[collapsible=icon]:hidden">
+        <div className="rounded-xl border border-sidebar-border bg-sidebar-accent/30 p-3 group-data-[collapsible=icon]:hidden">
           <div className="mb-2 flex items-center justify-between gap-2">
             <p className="text-xs font-medium text-sidebar-foreground/70">
               Storage
             </p>
-            <p className="text-xs text-sidebar-foreground/55">
+            <p className="text-xs text-sidebar-foreground/60">
               {appConfig.storageUsedGb} GB of {appConfig.storageTotalGb} GB
             </p>
           </div>
           <Progress
             value={storagePercent}
-            className="mb-2 h-1.5 bg-white/15 **:data-[slot=progress-indicator]:bg-[#22c55e]"
+            className="mb-2 h-1.5 bg-sidebar-border **:data-[slot=progress-indicator]:bg-primary"
           />
           <button
             type="button"
