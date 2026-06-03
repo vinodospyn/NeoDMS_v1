@@ -1,16 +1,14 @@
 # NeoDMS — Ospyn Neo My Drive
 
-A Next.js app combining the **Ospyn multi-layout template** with a **document-management (Neo Drive) UI**. The default experience is the drive shell: dark sidebar, dashboard at `/`, and file explorer for “Owned by me”.
-
-Template layout modes remain available for demos and alternate products.
+A Next.js document-management UI (**Ospyn Neo My Drive**) with the drive shell as the default product. Layout route groups are kept for future alternate shells.
 
 ## Layout Modes
 
 | Mode | Route group | Use |
 |------|-------------|-----|
 | **Neo Drive (default)** | `(with-sidebar)` | Production DMS UI — sidebar + header + drive surface |
-| Header-only | `(with-header)` | Template demo sections, legacy requests dashboard |
-| Minimal | `(minimal)` | Upload, onboarding, full-screen flows |
+| Header-only | `(with-header)` | Layout shell only (add pages when needed) |
+| Minimal | `(minimal)` | Full-screen layout shell only |
 
 ## Folder Guide
 
@@ -21,10 +19,10 @@ app/
     layout.tsx              # driveShell + AppSidebar + DocumentsAppHeader
     page.tsx                # /  → DriveDashboardPage (DEFAULT)
     owned-by-me/page.tsx    # Owned by me → FileExplorerPage
-    shared-with-me/ …       # placeholders
-    settings/page.tsx       # Settings placeholder
-  (with-header)/            # /dashboard, /documents, …
-  (minimal)/                # /document-upload, /learn-minimal, …
+    shared-with-me/ …       # placeholders (sidebar nav)
+    settings/page.tsx
+  (with-header)/layout.tsx  # HeaderLayout shell (no demo pages)
+  (minimal)/layout.tsx      # MinimalLayout shell (no demo pages)
 
 components/
   layout/                   # app-sidebar, documents-app-header, *-layout
@@ -32,9 +30,6 @@ components/
 
 features/
   drive/                    # Dashboard, quick access, explorer, mocks
-  dashboard/                # Requests / neo-table (header shell demo)
-  upload/                   # Upload screens
-  showcase/                 # /ui-showcase
 
 config/
   app.ts                    # Branding, user, workspace, storage
@@ -53,7 +48,7 @@ config/
 
 ## Golden Rules
 
-1. Keep route files thin — compose from `features/*/components`.
+1. Keep route files thin — compose from `features/drive/components`.
 2. Drive shell chrome lives in `components/layout/`.
 3. Drive product logic and mocks live in `features/drive/`.
 4. Pick route group by shell; parentheses are not in the URL.
@@ -61,24 +56,16 @@ config/
 
 ## URLs to Test
 
-### Neo Drive (primary)
-
 | URL | Screen |
 |-----|--------|
 | `/` | Dashboard — Quick access + Recent Files |
 | `/owned-by-me` | Owned by me — file explorer |
-| `/settings` | Settings placeholder |
-| `/quick-access` | Quick access placeholder |
-
-### Template demos (unchanged)
-
-| URL | Screen |
-|-----|--------|
-| `/dashboard` | Header shell — requests / batches demo |
-| `/header-demo` | Header layout demo |
-| `/ui-showcase` | Component gallery |
-| `/learn-minimal`, `/document-upload` | Minimal shell |
-| `/templates`, `/archive` | Header-shell demo pages (`(with-header)` only; not in drive sidebar) |
+| `/shared-with-me` | Shared with me (placeholder) |
+| `/shared-by-me` | Shared by me (placeholder) |
+| `/quick-access` | Quick access (placeholder) |
+| `/recent` | Recent (placeholder) |
+| `/trash` | Trash (placeholder) |
+| `/settings` | Settings (placeholder) |
 
 ## Create a New Drive Page
 
@@ -109,9 +96,9 @@ pnpm build
 
 ## Related Docs
 
-- `docs/ROUTING_GUIDE.md` — route groups and template vs drive flows
+- `docs/ROUTING_GUIDE.md` — route groups
 - `docs/DRIVE_UI_GUIDE.md` — colors, spacing, component map
 - `docs/TYPOGRAPHY_GUIDE.md` — text scale
-- `docs/TABLE_BEHAVIOR_GUIDE.md` — table primitives vs file explorer vs neo-table
+- `docs/TABLE_BEHAVIOR_GUIDE.md` — table primitives vs file explorer
 - `.cursor/rules/neodms-project-context.mdc` — AI agent context (always on)
 - `.cursor/rules/neodms-drive-ui.mdc` — drive UI rules when editing drive files

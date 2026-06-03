@@ -1,4 +1,9 @@
-export type DriveItemType = "folder" | "pdf" | "docx" | "zip" | "image"
+import type { DriveFileKind } from "@/features/drive/lib/file-types"
+
+export type { DriveFileKind } from "@/features/drive/lib/file-types"
+
+/** @deprecated Prefer `DriveFileKind` — kept for existing drive item mocks. */
+export type DriveItemType = DriveFileKind
 
 export type DriveItem = {
   id: string

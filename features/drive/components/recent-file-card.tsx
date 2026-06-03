@@ -1,26 +1,25 @@
-import { Clock3, FileImage, FileText } from "lucide-react"
+import { Clock3 } from "lucide-react"
 
 import { Badge } from "@/components/ui/badge"
 import { cn } from "@/lib/utils"
+import { FileTypeIcon } from "@/features/drive/components/file-type-icon/file-type-icon"
 import type { RecentFileItem } from "@/features/drive/data/mock-dashboard"
-
-const TYPE_ICON = {
-  pdf: { icon: FileText, className: "text-rose-500" },
-  docx: { icon: FileText, className: "text-sky-600" },
-  image: { icon: FileImage, className: "text-orange-500" },
-} as const
 
 type RecentFileCardProps = {
   item: RecentFileItem
 }
 
 export function RecentFileCard({ item }: RecentFileCardProps) {
-  const { icon: Icon, className: iconClass } = TYPE_ICON[item.type]
-
   return (
     <article className="flex flex-col overflow-hidden rounded-xl border border-border/70 bg-background shadow-sm transition-shadow hover:shadow-md">
       <div className="flex items-start gap-2 border-b border-border/60 px-3 py-2.5">
-        <Icon className={cn("mt-0.5 size-4 shrink-0", iconClass)} aria-hidden />
+        <FileTypeIcon
+          name={item.name}
+          explicitType={item.type}
+          variant="compact"
+          size="sm"
+          className="mt-0.5"
+        />
         <div className="min-w-0 flex-1">
           <p className="truncate text-sm font-semibold text-foreground">{item.name}</p>
           <p className="truncate text-xs text-muted-foreground">{item.subtitle}</p>

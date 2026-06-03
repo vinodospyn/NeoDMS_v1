@@ -85,6 +85,7 @@
     --primary-button-from-hover: #049053;
     --primary-button-to-hover: #0b5a39;
     --primary-button-ring: rgb(16 185 129 / 45%);
+    --drive-folder-fill: #49597E;
 }
 
 :root[data-radius="compact"] {
@@ -155,6 +156,7 @@
     --primary-button-from-hover: #049053;
     --primary-button-to-hover: #0b5a39;
     --primary-button-ring: rgb(52 211 153 / 45%);
+    --drive-folder-fill: #646c7f;
 }
 
 .semi-dark {
@@ -498,7 +500,7 @@
 /* Neo Drive shell — layout surfaces only; accent comes from html[data-accent] */
 .drive-shell {
   --drive-surface: #f9fafb;
-  --drive-quick-access: #f2f4f7;
+  --drive-quick-access: #EFF3F7;
   --drive-search-bg: #eef4fb;
 }
 
@@ -554,6 +556,10 @@
 
 .drive-shell .drive-link:hover {
   color: color-mix(in oklch, var(--primary) 85%, black);
+}
+
+.drive-folder-fill {
+  fill: var(--drive-folder-fill);
 }
 
 /* Drive explorer (Owned by me) — light design (matches screenshot) */

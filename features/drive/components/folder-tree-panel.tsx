@@ -1,11 +1,12 @@
 "use client"
 
 import * as React from "react"
-import { ChevronRight, Folder, X } from "lucide-react"
+import { ChevronRight, X } from "lucide-react"
 
 import { Button } from "@/components/ui/button"
 import { ScrollArea } from "@/components/ui/scroll-area"
 import { cn } from "@/lib/utils"
+import { FileTypeIcon } from "@/features/drive/components/file-type-icon/file-type-icon"
 import type { FolderNode } from "@/features/drive/data/mock-folder-tree"
 
 type FolderTreePanelProps = {
@@ -67,7 +68,7 @@ function FolderTreeRow({
           <span className="size-5" aria-hidden />
         )}
 
-        <Folder className="size-4 text-muted-foreground" aria-hidden />
+        <FileTypeIcon kind="folder" variant="compact" size="sm" />
         <span className="min-w-0 truncate">{node.label}</span>
       </button>
 

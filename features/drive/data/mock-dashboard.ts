@@ -1,17 +1,18 @@
-export type QuickAccessItemKind = "folder" | "docx" | "pdf"
+import type { DriveFileKind } from "@/features/drive/lib/file-types"
 
 export type QuickAccessItem = {
   id: string
   name: string
   subtitle: string
-  kind: QuickAccessItemKind
+  kind: DriveFileKind
+  shared?: boolean
 }
 
 export type RecentFileItem = {
   id: string
   name: string
   subtitle: string
-  type: "pdf" | "docx" | "image"
+  type: DriveFileKind
   tag?: { label: string; className: string }
   openedAt: string
   previewClassName: string
@@ -35,7 +36,7 @@ export const quickAccessItems: QuickAccessItem[] = [
     id: "qa-3",
     name: "Documents",
     subtitle: "John Doe - Personal",
-    kind: "folder",
+    kind: "shared-folder",
   },
   {
     id: "qa-4",
@@ -71,7 +72,7 @@ export const quickAccessItems: QuickAccessItem[] = [
     id: "qa-9",
     name: "Agreement.docx",
     subtitle: "John Doe - Personal",
-    kind: "docx",
+    kind: "word",
   },
   {
     id: "qa-10",
@@ -95,7 +96,7 @@ export const recentFileItems: RecentFileItem[] = [
     id: "rf-2",
     name: "Cover Letter.docx",
     subtitle: "John Doe - Personal",
-    type: "docx",
+    type: "word",
     openedAt: "Opened Feb 27, 2028 - 05:53 PM",
     previewClassName: "bg-gradient-to-br from-sky-50 to-sky-100",
   },
@@ -120,7 +121,7 @@ export const recentFileItems: RecentFileItem[] = [
     id: "rf-5",
     name: "HR Policy.docx",
     subtitle: "John Doe - Personal",
-    type: "docx",
+    type: "word",
     tag: { label: "HR", className: "bg-emerald-100 text-emerald-800" },
     openedAt: "Opened Feb 27, 2028 - 05:53 PM",
     previewClassName: "bg-gradient-to-br from-violet-50 to-violet-100",

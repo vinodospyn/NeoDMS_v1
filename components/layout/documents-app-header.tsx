@@ -23,9 +23,6 @@ const ROUTE_TITLES: Record<string, string> = {
   "/recent": "Recent",
   "/trash": "Trash",
   "/settings": "Settings",
-  "/templates": "Templates",
-  "/archive": "Archive",
-  "/upload": "Upload",
 }
 
 function getPageTitle(pathname: string): string {

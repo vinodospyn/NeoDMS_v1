@@ -26,7 +26,7 @@ import {
 } from "@/components/ui/table"
 import { cn } from "@/lib/utils"
 import { mockDriveItems } from "@/features/drive/data/mock-files"
-import { DriveItemIcon } from "@/features/drive/components/drive-item-icon"
+import { FileTypeIcon } from "@/features/drive/components/file-type-icon/file-type-icon"
 import type { DriveItem, DriveSortDirection, DriveSortKey } from "@/features/drive/types"
 
 const ROWS_PER_PAGE = 10
@@ -204,7 +204,12 @@ export function FileExplorerTable({
                 </TableCell>
                 <TableCell className="py-2">
                   <div className="flex items-center gap-2.5">
-                    <DriveItemIcon type={item.type} />
+                    <FileTypeIcon
+                      name={item.name}
+                      explicitType={item.type}
+                      variant="compact"
+                      size="md"
+                    />
                     <span className="font-medium text-foreground">{item.name}</span>
                   </div>
                 </TableCell>
