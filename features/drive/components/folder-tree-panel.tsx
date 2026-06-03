@@ -8,12 +8,17 @@ import { ScrollArea } from "@/components/ui/scroll-area"
 import { cn } from "@/lib/utils"
 import { FileTypeIcon } from "@/features/drive/components/file-type-icon/file-type-icon"
 import type { FolderNode } from "@/features/drive/data/mock-folder-tree"
+import {
+  explorerFolderRowSelectedClass,
+  explorerPanelHeaderClass,
+} from "@/features/drive/lib/explorer-layout"
 
 type FolderTreePanelProps = {
   title?: string
   tree: FolderNode[]
   selectedId: string
   onSelectedIdChange: (id: string) => void
+  onClose?: () => void
 }
 
 function FolderTreeRow({
@@ -36,41 +41,46 @@ function FolderTreeRow({
   const isSelected = selectedId === node.id
 
   return (
-    <div className="space-y-1">
-      <button
-        type="button"
+    <div className="space-y-0.5">
+      <div
         className={cn(
-          "flex w-full items-center gap-2 rounded-lg px-2 py-2 text-left text-sm transition-colors",
+          "flex w-full items-center gap-1.5 rounded-md py-1.5 pr-2 text-left text-sm transition-colors",
           isSelected
-            ? "bg-sidebar-accent text-sidebar-accent-foreground"
-            : "hover:bg-muted/60"
+            ? explorerFolderRowSelectedClass
+            : "text-foreground hover:bg-muted/50"
         )}
-        style={{ paddingLeft: 8 + depth * 14 }}
-        onClick={() => onSelect(node.id)}
+        style={{ paddingLeft: 8 + depth * 12 }}
       >
         {hasChildren ? (
-          <span
-            className={cn(
-              "grid size-5 place-items-center rounded-md text-muted-foreground",
-              isSelected ? "text-sidebar-accent-foreground/80" : ""
-            )}
-            onClick={(e) => {
-              e.stopPropagation()
-              onToggle(node.id)
-            }}
+          <Button
+            type="button"
+            variant="ghost"
+            size="icon-sm"
+            className="size-5 shrink-0 text-muted-foreground hover:bg-transparent hover:text-foreground"
+            aria-label={isExpanded ? `Collapse ${node.label}` : `Expand ${node.label}`}
+            onClick={() => onToggle(node.id)}
           >
             <ChevronRight
-              className={cn("size-4 transition-transform", isExpanded ? "rotate-90" : "")}
+              className={cn(
+                "size-3.5 transition-transform duration-150",
+                isExpanded && "rotate-90"
+              )}
               aria-hidden
             />
-          </span>
+          </Button>
         ) : (
-          <span className="size-5" aria-hidden />
+          <span className="size-5 shrink-0" aria-hidden />
         )}
 
-        <FileTypeIcon kind="folder" variant="compact" size="sm" />
-        <span className="min-w-0 truncate">{node.label}</span>
-      </button>
+        <button
+          type="button"
+          className="flex min-w-0 flex-1 items-center gap-2 rounded-md text-left outline-none focus-visible:ring-2 focus-visible:ring-ring/50"
+          onClick={() => onSelect(node.id)}
+        >
+          <FileTypeIcon kind="folder" variant="compact" size="sm" />
+          <span className="min-w-0 truncate">{node.label}</span>
+        </button>
+      </div>
 
       {hasChildren && isExpanded
         ? node.children!.map((child) => (
@@ -94,6 +104,7 @@ export function FolderTreePanel({
   tree,
   selectedId,
   onSelectedIdChange,
+  onClose,
 }: FolderTreePanelProps) {
   const [expandedIds, setExpandedIds] = React.useState<Set<string>>(
     () => new Set(["onboarding", "employees"])
@@ -109,21 +120,22 @@ export function FolderTreePanel({
   }, [])
 
   return (
-    <div className="flex h-full flex-col border-r bg-background">
-      <div className="flex h-12 items-center justify-between px-3">
+    <div className="flex h-full flex-col bg-background">
+      <div className={explorerPanelHeaderClass}>
         <p className="text-sm font-semibold text-foreground">{title}</p>
         <Button
           type="button"
           variant="ghost"
           size="icon-sm"
-          className="text-muted-foreground"
-          aria-label="Close folders"
+          className="text-muted-foreground hover:text-foreground"
+          aria-label="Close My Folders"
+          onClick={onClose}
         >
           <X className="size-4" aria-hidden />
         </Button>
       </div>
       <ScrollArea className="min-h-0 flex-1 px-2 pb-3">
-        <div className="space-y-1 pt-1">
+        <div className="space-y-0.5 py-2">
           {tree.map((node) => (
             <FolderTreeRow
               key={node.id}
@@ -140,4 +152,3 @@ export function FolderTreePanel({
     </div>
   )
 }
-

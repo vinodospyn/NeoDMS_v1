@@ -143,8 +143,8 @@ export function FileExplorerTable({
 
   const table = (
     <>
-      <div className="min-h-0 flex-1 overflow-x-auto overflow-y-auto">
-      <Table className="min-w-[960px]">
+      <div className="min-h-0 w-full max-w-full flex-1 overflow-auto">
+      <Table className="min-w-[960px] w-full">
         <TableHeader>
           <TableRow className="hover:bg-transparent">
             <TableHead className="w-12">
@@ -272,7 +272,7 @@ export function FileExplorerTable({
         </TableBody>
       </Table>
       </div>
-      <TableFooterBar className="mt-auto shrink-0 border-t">
+      <TableFooterBar className="mt-auto shrink-0 border-t border-border/60 bg-background px-4 py-2.5">
         <p className="text-sm text-muted-foreground">
           Showing {pageStart}-{pageEnd} of {sorted.length}
         </p>
@@ -340,7 +340,9 @@ export function FileExplorerTable({
 
   if (embedded) {
     return (
-      <div className="flex min-h-0 flex-1 flex-col overflow-hidden">{table}</div>
+      <div className="flex min-h-0 w-full max-w-full flex-1 flex-col overflow-hidden">
+        {table}
+      </div>
     )
   }
 
