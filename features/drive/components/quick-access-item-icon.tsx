@@ -14,11 +14,7 @@ export function QuickAccessItemIcon({ kind }: QuickAccessItemIconProps) {
         aria-hidden
       >
         <Folder
-          className="size-8 fill-[#1d4ed8] text-[#38bdf8]"
-          strokeWidth={1}
-        />
-        <Star
-          className="absolute size-[11px] fill-white text-white"
+          className="size-12 fill-[#49597E] text-[#38bdf8] dark:fill-[#646c7f] dark:text-[#38bdf8]"
           strokeWidth={0}
         />
       </div>
@@ -38,7 +34,7 @@ export function QuickAccessItemIcon({ kind }: QuickAccessItemIconProps) {
 
   return (
     <div
-      className="flex size-8 shrink-0 flex-col items-center justify-center rounded-[4px] bg-[#dc2626] px-0.5 text-[7px] font-bold leading-tight text-white shadow-sm"
+      className="flex size-8 shrink-0 flex-col items-center justify-center rounded-[4px] bg-[#dc2626] px-0.5 text-[7px] leading-tight font-bold text-white shadow-sm"
       aria-hidden
     >
       PDF

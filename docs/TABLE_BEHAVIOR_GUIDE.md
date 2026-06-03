@@ -115,7 +115,7 @@ Implements the **Owned by me** file list from the DMS UI: checkbox, name with ty
 
 ### Route reference
 
-`/sample-sidebar/documents` renders `<FileExplorerPage />` (breadcrumbs, toolbar, and `<FileExplorerTable embedded />`).
+`/owned-by-me` renders `<FileExplorerPage />` (breadcrumbs, toolbar, and `<FileExplorerTable embedded />`).
 
 ### Columns
 
@@ -212,4 +212,4 @@ export function RequestsDashboardTab() {
 **Global table look-and-feel**
 
 - `components/ui/table.tsx` (affects all consumers)
-- Re-verify `/` (dashboard), `/sample-sidebar/documents` (explorer), `(with-header)` `/dashboard` (neo-table), and `/ui-showcase` table block
+- Re-verify `/` (dashboard), `/owned-by-me` (explorer), `(with-header)` `/dashboard` (neo-table), and `/ui-showcase` table block

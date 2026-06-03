@@ -62,20 +62,33 @@ type FileExplorerTableProps = {
   /** When true, renders inside `FileExplorerPage` shell (no outer card). */
   embedded?: boolean
   folderSearch?: string
+  selectedId?: string
+  onSelectedIdChange?: (id: string) => void
 }
 
 export function FileExplorerTable({
   embedded = false,
   folderSearch = "",
+  selectedId: selectedIdProp,
+  onSelectedIdChange,
 }: FileExplorerTableProps) {
   const [items] = React.useState(mockDriveItems)
-  const [selectedId, setSelectedId] = React.useState<string>("2")
+  const [selectedIdState, setSelectedIdState] = React.useState<string>("2")
   const [selectedIds, setSelectedIds] = React.useState<Set<string>>(new Set())
   const [sortKey, setSortKey] = React.useState<DriveSortKey>("name")
   const [sortDirection, setSortDirection] =
     React.useState<DriveSortDirection>("asc")
   const [page, setPage] = React.useState(1)
   const [goToPage, setGoToPage] = React.useState("")
+  const selectedId = selectedIdProp ?? selectedIdState
+
+  const setSelectedId = React.useCallback(
+    (id: string) => {
+      setSelectedIdState(id)
+      onSelectedIdChange?.(id)
+    },
+    [onSelectedIdChange]
+  )
 
   const filtered = React.useMemo(() => {
     const term = folderSearch.trim().toLowerCase()

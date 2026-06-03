@@ -3,3 +3,4 @@ import { DrivePlaceholderPage } from "@/features/drive/components/drive-placehol
 export default function SharedWithMePage() {
   return <DrivePlaceholderPage title="Shared with me" />
 }
+

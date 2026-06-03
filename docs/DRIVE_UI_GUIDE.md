@@ -7,7 +7,7 @@ Design reference for the **Ospyn Neo My Drive** shell implemented in `(with-side
 | In scope | Out of scope (template demos) |
 |----------|-------------------------------|
 | `/` dashboard | `(with-header)` `/dashboard` requests table |
-| `/sample-sidebar/documents` explorer | `/learn-minimal` unless linked from marketing |
+| `/owned-by-me` explorer | `/learn-minimal` unless linked from marketing |
 | Sidebar + `DocumentsAppHeader` | `/ui-showcase` |
 
 Drive styling is scoped via `.drive-shell` on `SidebarProvider` (`app/(with-sidebar)/layout.tsx`).
@@ -61,7 +61,7 @@ Drive styling is scoped via `.drive-shell` on `SidebarProvider` (`app/(with-side
 - **10 items**, 5 columns × 2 rows at `xl`
 - **Folders:** blue folder icon with white star centered
 - **Files:** Word (`W` on `#2b579a`), PDF (red `PDF` badge)
-- **View more** → `/sample-sidebar/quick-access`
+- **View more** → `/quick-access`
 
 Mock data: `features/drive/data/mock-dashboard.ts` → `quickAccessItems`.
 
@@ -73,7 +73,7 @@ Mock data: `features/drive/data/mock-dashboard.ts` → `quickAccessItems`.
 
 ## File Explorer — Owned by Me
 
-Route: `/sample-sidebar/documents`
+Route: `/owned-by-me`
 
 1. Breadcrumb trail (e.g. My Files › On-boarding › …)
 2. Toolbar: “Search in selected folder”, view/sort/filter icons, green **+ New**

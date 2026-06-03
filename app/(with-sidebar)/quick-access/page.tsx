@@ -3,3 +3,4 @@ import { DrivePlaceholderPage } from "@/features/drive/components/drive-placehol
 export default function QuickAccessPage() {
   return <DrivePlaceholderPage title="Quick access" />
 }
+

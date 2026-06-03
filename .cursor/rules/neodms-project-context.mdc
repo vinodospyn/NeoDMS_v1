@@ -26,8 +26,7 @@ Next.js App Router (Turbopack) · React 19 · shadcn (`radix-nova`) · Tailwind 
 app/
   (with-sidebar)/           # Neo Drive — DEFAULT PRODUCT
     page.tsx                # /  → DriveDashboardPage
-    sample-sidebar/         # legacy paths + feature routes
-      documents/            # Owned by me → FileExplorerPage
+    owned-by-me/            # Owned by me → FileExplorerPage
   (with-header)/            # Template demo (separate nav)
   (minimal)/                # Upload, onboarding demos
 components/
@@ -57,15 +56,14 @@ docs/                       # PROJECT_OVERVIEW, ROUTING, DRIVE_UI, TABLE, TYPOGR
 | URL | Page / component |
 |-----|------------------|
 | `/` | `DriveDashboardPage` |
-| `/sample-sidebar/documents` | `FileExplorerPage` (Owned by me) |
-| `/sample-sidebar/shared-with-me` | placeholder |
-| `/sample-sidebar/shared-by-me` | placeholder |
-| `/sample-sidebar/quick-access` | placeholder |
-| `/sample-sidebar/recent` | placeholder |
-| `/sample-sidebar/trash` | placeholder |
-| `/sample-sidebar/settings` | settings + ThemeManager |
-| `/sample-sidebar` | redirects → `/` |
-| `/sample-sidebar/templates`, `/archive` | legacy `SectionPage` (not in sidebar nav) |
+| `/owned-by-me` | `FileExplorerPage` (Owned by me) |
+| `/shared-with-me` | placeholder |
+| `/shared-by-me` | placeholder |
+| `/quick-access` | placeholder |
+| `/recent` | placeholder |
+| `/trash` | placeholder |
+| `/settings` | placeholder |
+| `/templates`, `/archive` | `(with-header)` template demo only — do not duplicate under `(with-sidebar)` |
 
 ## Sidebar Nav (`config/nav/sidebar-nav.ts`)
 

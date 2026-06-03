@@ -2,14 +2,7 @@
 
 import * as React from "react"
 import { usePathname } from "next/navigation"
-import {
-  Bell,
-  ChevronDown,
-  Palette,
-  Search,
-  Sparkles,
-  X,
-} from "lucide-react"
+import { Bell, ChevronDown, Palette, Search, Sparkles, X } from "lucide-react"
 
 import { ThemeManager } from "@/components/theme-manager"
 import { appConfig } from "@/config/app"
@@ -23,15 +16,16 @@ import { isNavItemActive } from "@/lib/navigation"
 
 const ROUTE_TITLES: Record<string, string> = {
   "/": "Dashboard",
-  "/sample-sidebar/documents": "Owned by me",
-  "/sample-sidebar/shared-with-me": "Shared with me",
-  "/sample-sidebar/shared-by-me": "Shared by me",
-  "/sample-sidebar/quick-access": "Quick access",
-  "/sample-sidebar/recent": "Recent",
-  "/sample-sidebar/trash": "Trash",
-  "/sample-sidebar/settings": "Settings",
-  "/sample-sidebar/templates": "Templates",
-  "/sample-sidebar/archive": "Archive",
+  "/owned-by-me": "Owned by me",
+  "/shared-with-me": "Shared with me",
+  "/shared-by-me": "Shared by me",
+  "/quick-access": "Quick access",
+  "/recent": "Recent",
+  "/trash": "Trash",
+  "/settings": "Settings",
+  "/templates": "Templates",
+  "/archive": "Archive",
+  "/upload": "Upload",
 }
 
 function getPageTitle(pathname: string): string {
@@ -85,7 +79,7 @@ export function DocumentsAppHeader() {
 
   return (
     <header className="border-b border-border/70 bg-background">
-      <div className="mx-auto w-full max-w-[1400px] px-6 md:px-8">
+      <div className="mx-auto w-full px-4">
         <div className="flex h-14 items-center gap-2 md:hidden">
           <SidebarTrigger className="shrink-0" />
           <p className="min-w-0 truncate text-sm font-medium text-foreground">

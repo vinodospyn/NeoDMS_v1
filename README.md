@@ -25,7 +25,7 @@ Open **http://localhost:3000/** — DMS dashboard (default).
 
 Other entry points:
 
-- `/sample-sidebar/documents` — Owned by me (file explorer)
+- `/owned-by-me` — Owned by me (file explorer)
 - `/dashboard` — template header-shell demo (requests table)
 - `/ui-showcase` — component gallery
 

@@ -20,10 +20,9 @@ app/
   (with-sidebar)/
     layout.tsx              # driveShell + AppSidebar + DocumentsAppHeader
     page.tsx                # /  → DriveDashboardPage (DEFAULT)
-    sample-sidebar/
-      documents/page.tsx    # Owned by me → FileExplorerPage
-      shared-with-me/ …     # placeholders
-      settings/page.tsx     # ThemeManager (template controls)
+    owned-by-me/page.tsx    # Owned by me → FileExplorerPage
+    shared-with-me/ …       # placeholders
+    settings/page.tsx       # Settings placeholder
   (with-header)/            # /dashboard, /documents, …
   (minimal)/                # /document-upload, /learn-minimal, …
 
@@ -67,9 +66,9 @@ config/
 | URL | Screen |
 |-----|--------|
 | `/` | Dashboard — Quick access + Recent Files |
-| `/sample-sidebar/documents` | Owned by me — file explorer |
-| `/sample-sidebar/settings` | Settings + theme controls |
-| `/sample-sidebar/quick-access` | Quick access placeholder |
+| `/owned-by-me` | Owned by me — file explorer |
+| `/settings` | Settings placeholder |
+| `/quick-access` | Quick access placeholder |
 
 ### Template demos (unchanged)
 
@@ -79,7 +78,7 @@ config/
 | `/header-demo` | Header layout demo |
 | `/ui-showcase` | Component gallery |
 | `/learn-minimal`, `/document-upload` | Minimal shell |
-| `/sample-sidebar/templates`, `/archive` | Legacy section pages (not in drive nav) |
+| `/templates`, `/archive` | Header-shell demo pages (`(with-header)` only; not in drive sidebar) |
 
 ## Create a New Drive Page
 

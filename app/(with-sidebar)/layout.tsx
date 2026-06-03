@@ -13,7 +13,7 @@ export default function WithSidebarLayoutGroup({
       sidebar={<AppSidebar />}
       header={<DocumentsAppHeader />}
       defaultOpen
-      contentClassName="drive-main flex min-h-0 flex-1 flex-col overflow-y-auto py-4 md:py-5"
+      contentClassName="drive-main flex min-h-0 flex-1 flex-col overflow-y-auto "
     >
       {children}
     </SidebarHeaderLayout>

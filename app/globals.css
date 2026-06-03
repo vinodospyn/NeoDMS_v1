@@ -555,3 +555,5 @@
 .drive-shell .drive-link:hover {
   color: color-mix(in oklch, var(--primary) 85%, black);
 }
+
+/* Drive explorer (Owned by me) — light design (matches screenshot) */

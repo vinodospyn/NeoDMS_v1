@@ -26,8 +26,7 @@ Next.js App Router **route groups** apply different shells. Parentheses in folde
 | File | URL |
 |------|-----|
 | `app/(with-sidebar)/page.tsx` | `/` |
-| `app/(with-sidebar)/sample-sidebar/documents/page.tsx` | `/sample-sidebar/documents` |
-| `app/(with-sidebar)/sample-sidebar/page.tsx` | `/sample-sidebar` → redirects to `/` |
+| `app/(with-sidebar)/owned-by-me/page.tsx` | `/owned-by-me` |
 | `app/(with-header)/dashboard/page.tsx` | `/dashboard` |
 | `app/(minimal)/learn-minimal/page.tsx` | `/learn-minimal` |
 
@@ -37,7 +36,7 @@ Next.js App Router **route groups** apply different shells. Parentheses in folde
 
 1. User opens **`/`** → dashboard with sidebar (Quick access, Recent Files).
 2. Sidebar navigates to Owned by me, Shared, etc.
-3. Settings at `/sample-sidebar/settings` includes template **ThemeManager**.
+3. Settings at `/settings`.
 
 ### Template handoff (optional, not default)
 
