@@ -6,7 +6,7 @@ export const EXPLORER_DRAWER_TRANSITION_MS = 300
 export const EXPLORER_DRAWER_EASE = "cubic-bezier(0.32, 0.72, 0, 1)"
 
 export const explorerChromeBarClass =
-  "flex h-11 shrink-0 items-center gap-2 border-b border-border/60 bg-background px-4"
+  "flex h-11 shrink-0 items-center gap-2  bg-background px-4"
 
 export const explorerPanelHeaderClass =
   "flex h-11 shrink-0 items-center justify-between gap-2 border-b border-border/60 bg-background px-3"

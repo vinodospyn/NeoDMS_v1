@@ -1,7 +1,7 @@
 "use client"
 
 import * as React from "react"
-import { ChevronDown, Home, Info } from "lucide-react"
+import { ChevronDown, Home } from "lucide-react"
 
 import {
   Breadcrumb,
@@ -11,12 +11,10 @@ import {
   BreadcrumbPage,
   BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb"
-import { Button } from "@/components/ui/button"
 import { cn } from "@/lib/utils"
 import { CertificationDrawer } from "@/features/drive/components/certification-drawer"
 import { FileExplorerTable } from "@/features/drive/components/file-explorer-table"
 import { FileExplorerToolbar } from "@/features/drive/components/file-explorer-toolbar"
-import { FolderTreeToggleIcon } from "@/features/drive/components/folder-tree-toggle-icon"
 import { MyFoldersDrawer } from "@/features/drive/components/my-folders-drawer"
 import { mockDriveItems } from "@/features/drive/data/mock-files"
 import { mockFolderTree } from "@/features/drive/data/mock-folder-tree"
@@ -27,7 +25,6 @@ import {
   explorerChromeBarClass,
   explorerDrawerEdgeLeftClass,
   explorerDrawerEdgeRightClass,
-  explorerFolderToggleClass,
   findFolderLabel,
   getExplorerGridTemplateColumns,
 } from "@/features/drive/lib/explorer-layout"
@@ -105,24 +102,6 @@ export function FileExplorerPage() {
 
         <div className="flex min-h-0 min-w-0 flex-col overflow-hidden">
           <div className={explorerChromeBarClass}>
-            <Button
-              type="button"
-              variant="ghost"
-              size="icon-sm"
-              className={cn(
-                explorerFolderToggleClass,
-                myFoldersDrawerOpen && "ring-2 ring-primary/20"
-              )}
-              aria-label={
-                myFoldersDrawerOpen ? "Close My Folders" : "Open My Folders"
-              }
-              aria-pressed={myFoldersDrawerOpen}
-              aria-expanded={myFoldersDrawerOpen}
-              onClick={toggleMyFoldersDrawer}
-            >
-              <FolderTreeToggleIcon />
-            </Button>
-
             <Breadcrumb className="min-w-0 flex-1 overflow-hidden">
               <BreadcrumbList className="flex-nowrap gap-1 overflow-hidden text-sm">
                 <BreadcrumbItem className="shrink-0">
@@ -153,34 +132,16 @@ export function FileExplorerPage() {
                 </BreadcrumbItem>
               </BreadcrumbList>
             </Breadcrumb>
-
-            <Button
-              type="button"
-              variant="ghost"
-              size="icon-sm"
-              className={cn(
-                "ml-1 size-8 shrink-0 rounded-full text-white transition-all duration-200 hover:text-white",
-                certificationDrawerOpen
-                  ? "bg-primary/85 shadow-sm hover:bg-primary/75"
-                  : "primary-button hover:opacity-90"
-              )}
-              aria-label={
-                certificationDrawerOpen
-                  ? "Close certificates panel"
-                  : "Open certificates panel"
-              }
-              aria-pressed={certificationDrawerOpen}
-              aria-expanded={certificationDrawerOpen}
-              onClick={toggleCertificationDrawer}
-            >
-              <Info className="size-4" aria-hidden />
-            </Button>
           </div>
 
           <div className="flex min-h-0 min-w-0 flex-1 flex-col overflow-hidden">
             <FileExplorerToolbar
               folderSearch={folderSearch}
               onFolderSearchChange={setFolderSearch}
+              myFoldersOpen={myFoldersDrawerOpen}
+              onToggleMyFolders={toggleMyFoldersDrawer}
+              certificationOpen={certificationDrawerOpen}
+              onToggleCertification={toggleCertificationDrawer}
             />
             <FileExplorerTable
               folderSearch={folderSearch}
