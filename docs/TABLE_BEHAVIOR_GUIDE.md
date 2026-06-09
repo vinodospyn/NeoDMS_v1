@@ -34,6 +34,7 @@ Do **not** put drive-specific columns into `components/ui/table.tsx`.
 | `TableHead` | Column label (`h-11`, `px-4`, muted text) |
 | `TableSortHead` | Sortable header with arrow affordance |
 | `TableBody` / `TableRow` / `TableCell` | Body rows and cells |
+| `TableRowActions` / `TableRowAction` | Row action toolbar; use `visibility="always"` only for the more (⋮) menu |
 | `TableFooterBar` | Footer row for “Showing X–Y of Z” + pagination |
 | `TableFooter` / `TableCaption` | Rare semantic footer / caption |
 
@@ -125,7 +126,7 @@ Implements the **Owned by me** file list from the DMS UI: checkbox, name with ty
 | Workspace | No | Muted text |
 | Created Date | Yes | Muted text |
 | File Size | No | `--` for folders |
-| Actions | No | Star (filled when starred), Share, More |
+| Actions | No | Star, Share, Download, Perspective view (visible on row hover); More (⋮) always visible |
 
 ### Selection behavior
 

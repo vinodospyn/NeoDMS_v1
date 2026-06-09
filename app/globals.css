@@ -565,4 +565,55 @@
   fill: var(--drive-folder-fill);
 }
 
+/* Document viewer / perspective view header — theme-aware chrome */
+.document-viewer-header {
+  --viewer-header-bg: var(--background);
+  --viewer-header-fg: var(--foreground);
+  --viewer-header-muted: var(--muted-foreground);
+  --viewer-header-border: var(--border);
+  --viewer-header-action-bg: color-mix(in oklch, var(--foreground) 4%, transparent);
+  --viewer-header-action-border: color-mix(in oklch, var(--foreground) 10%, transparent);
+  --viewer-header-action-fg: var(--muted-foreground);
+  --viewer-header-action-hover-bg: color-mix(in oklch, var(--foreground) 8%, transparent);
+  --viewer-header-action-hover-fg: var(--foreground);
+  background-color: var(--viewer-header-bg);
+  color: var(--viewer-header-fg);
+  border-color: var(--viewer-header-border);
+}
+
+.semi-dark .document-viewer-header {
+  --viewer-header-bg: #0b121e;
+  --viewer-header-fg: #f1f5f9;
+  --viewer-header-muted: #94a3b8;
+  --viewer-header-border: rgb(255 255 255 / 10%);
+  --viewer-header-action-bg: rgb(255 255 255 / 6%);
+  --viewer-header-action-border: rgb(255 255 255 / 12%);
+  --viewer-header-action-fg: #cbd5e1;
+  --viewer-header-action-hover-bg: rgb(255 255 255 / 10%);
+  --viewer-header-action-hover-fg: #f8fafc;
+}
+
+.dark .document-viewer-header {
+  --viewer-header-bg: #0b121e;
+  --viewer-header-fg: #f1f5f9;
+  --viewer-header-muted: #94a3b8;
+  --viewer-header-border: rgb(255 255 255 / 10%);
+  --viewer-header-action-bg: rgb(255 255 255 / 6%);
+  --viewer-header-action-border: rgb(255 255 255 / 12%);
+  --viewer-header-action-fg: #cbd5e1;
+  --viewer-header-action-hover-bg: rgb(255 255 255 / 10%);
+  --viewer-header-action-hover-fg: #f8fafc;
+}
+
+.document-viewer-header .viewer-header-action {
+  background-color: var(--viewer-header-action-bg);
+  border-color: var(--viewer-header-action-border);
+  color: var(--viewer-header-action-fg);
+}
+
+.document-viewer-header .viewer-header-action:hover {
+  background-color: var(--viewer-header-action-hover-bg);
+  color: var(--viewer-header-action-hover-fg);
+}
+
 /* Drive explorer (Owned by me) — light design (matches screenshot) */

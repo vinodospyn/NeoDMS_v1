@@ -1,7 +1,8 @@
 "use client"
 
 import * as React from "react"
-import { MoreVertical, Share2, Star } from "lucide-react"
+import { useRouter } from "next/navigation"
+import { Download, ExternalLink, MoreVertical, Share2, Star } from "lucide-react"
 
 import { Button } from "@/components/ui/button"
 import { Checkbox } from "@/components/ui/checkbox"
@@ -22,6 +23,8 @@ import {
   TableHead,
   TableHeader,
   TableRow,
+  TableRowAction,
+  TableRowActions,
   TableSortHead,
 } from "@/components/ui/table"
 import { cn } from "@/lib/utils"
@@ -72,6 +75,7 @@ export function FileExplorerTable({
   selectedId: selectedIdProp,
   onSelectedIdChange,
 }: FileExplorerTableProps) {
+  const router = useRouter()
   const [items] = React.useState(mockDriveItems)
   const [selectedIdState, setSelectedIdState] = React.useState<string>("2")
   const [selectedIds, setSelectedIds] = React.useState<Set<string>>(new Set())
@@ -171,7 +175,7 @@ export function FileExplorerTable({
               Created Date
             </TableSortHead>
             <TableHead className="w-[10%]">File Size</TableHead>
-            <TableHead className="w-[132px] text-right">Actions</TableHead>
+            <TableHead className="w-[188px] text-right">Actions</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
@@ -229,12 +233,9 @@ export function FileExplorerTable({
                   className="py-2 text-right"
                   onClick={(event) => event.stopPropagation()}
                 >
-                  <div className="flex items-center justify-end gap-0.5">
-                    <Button
+                  <TableRowActions>
+                    <TableRowAction
                       type="button"
-                      variant="ghost"
-                      size="icon-sm"
-                      className="text-muted-foreground"
                       aria-label={item.starred ? "Unstar" : "Star"}
                     >
                       <Star
@@ -245,26 +246,30 @@ export function FileExplorerTable({
                             : "opacity-70"
                         )}
                       />
-                    </Button>
-                    <Button
-                      type="button"
-                      variant="ghost"
-                      size="icon-sm"
-                      className="text-muted-foreground"
-                      aria-label="Share"
-                    >
+                    </TableRowAction>
+                    <TableRowAction type="button" aria-label="Share">
                       <Share2 className="size-4" />
-                    </Button>
-                    <Button
+                    </TableRowAction>
+                    <TableRowAction type="button" aria-label="Download">
+                      <Download className="size-4" />
+                    </TableRowAction>
+                    <TableRowAction
                       type="button"
-                      variant="ghost"
-                      size="icon-sm"
-                      className="text-muted-foreground"
+                      aria-label="Open in perspective view"
+                      onClick={() =>
+                        router.push(`/perspective-view?id=${item.id}`)
+                      }
+                    >
+                      <ExternalLink className="size-4" />
+                    </TableRowAction>
+                    <TableRowAction
+                      type="button"
+                      visibility="always"
                       aria-label="More actions"
                     >
                       <MoreVertical className="size-4" />
-                    </Button>
-                  </div>
+                    </TableRowAction>
+                  </TableRowActions>
                 </TableCell>
               </TableRow>
             )

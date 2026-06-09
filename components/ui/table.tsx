@@ -3,6 +3,7 @@
 import * as React from "react"
 import { ArrowDown, ArrowUp, ArrowUpDown } from "lucide-react"
 
+import { Button } from "@/components/ui/button"
 import { cn } from "@/lib/utils"
 
 function TableContainer({
@@ -77,7 +78,7 @@ function TableRow({ className, ...props }: React.ComponentProps<"tr">) {
     <tr
       data-slot="table-row"
       className={cn(
-        "border-b border-border/60 transition-colors",
+        "group border-b border-border/60 transition-colors",
         "hover:bg-muted/35",
         "has-aria-expanded:bg-muted/35",
         "data-[state=selected]:bg-sky-50/90 data-[state=selected]:hover:bg-sky-50",
@@ -195,6 +196,54 @@ function TableFooterBar({
   )
 }
 
+function TableRowActions({ className, ...props }: React.ComponentProps<"div">) {
+  return (
+    <div
+      data-slot="table-row-actions"
+      className={cn("flex items-center justify-end gap-0.5", className)}
+      {...props}
+    />
+  )
+}
+
+const tableRowActionVisibilityClass = {
+  hover: cn(
+    "pointer-events-none invisible opacity-0 transition-[opacity,visibility] duration-150",
+    "group-hover:pointer-events-auto group-hover:visible group-hover:opacity-100",
+    "group-focus-within:pointer-events-auto group-focus-within:visible group-focus-within:opacity-100",
+    "group-data-[state=selected]:pointer-events-auto group-data-[state=selected]:visible group-data-[state=selected]:opacity-100",
+    "focus-visible:pointer-events-auto focus-visible:visible focus-visible:opacity-100"
+  ),
+  always: "",
+} as const
+
+type TableRowActionProps = React.ComponentProps<typeof Button> & {
+  /** `hover` hides until row hover/focus/selection; `always` stays visible (e.g. more menu). */
+  visibility?: keyof typeof tableRowActionVisibilityClass
+}
+
+function TableRowAction({
+  className,
+  visibility = "hover",
+  variant = "ghost",
+  size = "icon-sm",
+  ...props
+}: TableRowActionProps) {
+  return (
+    <Button
+      data-slot="table-row-action"
+      variant={variant}
+      size={size}
+      className={cn(
+        "text-muted-foreground",
+        tableRowActionVisibilityClass[visibility],
+        className
+      )}
+      {...props}
+    />
+  )
+}
+
 export {
   Table,
   TableBody,
@@ -206,5 +255,7 @@ export {
   TableHead,
   TableHeader,
   TableRow,
+  TableRowAction,
+  TableRowActions,
   TableSortHead,
 }
