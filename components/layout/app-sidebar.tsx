@@ -3,12 +3,10 @@
 import * as React from "react"
 import Link from "next/link"
 import { usePathname, useRouter } from "next/navigation"
-import { Gem } from "lucide-react"
 
 import { appConfig } from "@/config/app"
 import { getSidebarNavItems } from "@/config/nav/resolver"
 import { sidebarSettingsNavItem } from "@/config/nav/sidebar-nav"
-import { Button } from "@/components/ui/button"
 import { Progress } from "@/components/ui/progress"
 import { Separator } from "@/components/ui/separator"
 import {
@@ -17,7 +15,6 @@ import {
   SidebarFooter,
   SidebarGroup,
   SidebarGroupContent,
-  SidebarGroupLabel,
   SidebarHeader,
   SidebarMenu,
   SidebarMenuButton,
@@ -38,10 +35,10 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   return (
     <Sidebar
       collapsible="icon"
-      className="border-r-0 [--sidebar-width-icon:3.75rem]"
+      className="border-r-0 [--sidebar-width-icon:3.25rem]"
       {...props}
     >
-      <SidebarHeader className="gap-3 px-3 py-4">
+      <SidebarHeader className="gap-3 px-3 py-4 group-data-[collapsible=icon]:px-2">
         <div className="flex items-start gap-2.5 group-data-[collapsible=icon]:justify-center">
           <div className="flex size-9 shrink-0 items-center justify-center rounded-lg bg-primary text-sm font-bold text-primary-foreground">
             O

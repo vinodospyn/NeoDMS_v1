@@ -72,7 +72,9 @@ export function DashboardNavbar({
       </Sheet>
 
       <div className="w-48">
-        <p className="text-base font-semibold tracking-tight">{appConfig.productName}</p>
+        <p className="text-base font-semibold tracking-tight">
+          {appConfig.productName}
+        </p>
       </div>
 
       <nav className="hidden flex-1 items-center justify-center gap-1 text-sm font-medium text-muted-foreground md:flex">
@@ -98,12 +100,20 @@ export function DashboardNavbar({
         <Button size="lg" className="primary-button mr-1 rounded-full">
           {appConfig.primaryCtaLabel}
         </Button>
-        <Button variant="ghost" size="icon-sm" className="text-muted-foreground">
+        <Button
+          variant="ghost"
+          size="icon-sm"
+          className="text-muted-foreground"
+        >
           <Bell className="size-4" />
         </Button>
         <ThemeManager
           trigger={
-            <Button variant="ghost" size="icon-sm" className="text-muted-foreground">
+            <Button
+              variant="ghost"
+              size="icon-sm"
+              className="text-muted-foreground"
+            >
               <Cog className="size-4" />
             </Button>
           }

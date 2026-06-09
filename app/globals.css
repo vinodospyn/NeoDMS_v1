@@ -85,6 +85,8 @@
     --primary-button-from-hover: #049053;
     --primary-button-to-hover: #0b5a39;
     --primary-button-ring: rgb(16 185 129 / 45%);
+    --drive-folder-fill: #49597E;
+    --blue-light: #0040E0;
 }
 
 :root[data-radius="compact"] {
@@ -155,6 +157,7 @@
     --primary-button-from-hover: #049053;
     --primary-button-to-hover: #0b5a39;
     --primary-button-ring: rgb(52 211 153 / 45%);
+    --drive-folder-fill: #646c7f;
 }
 
 .semi-dark {
@@ -498,8 +501,10 @@
 /* Neo Drive shell — layout surfaces only; accent comes from html[data-accent] */
 .drive-shell {
   --drive-surface: #f9fafb;
-  --drive-quick-access: #f2f4f7;
-  --drive-search-bg: #eef4fb;
+  --drive-quick-access: #EFF3F7;  
+    --light-gradient-bg: linear-gradient(to top right,
+        color-mix(in oklch, var(--primary) 15%, transparent),
+        color-mix(in oklch, var(--blue-light) 15%, transparent));
 }
 
 /* Light theme — light sidebar shell; primary/accent follow selected palette */
@@ -515,7 +520,7 @@
 .dark .drive-shell {
   --drive-surface: #0f172a;
   --drive-quick-access: #1e293b;
-  --drive-search-bg: #1e293b;
+  --light-gradient-bg: #1e293b;
   --sidebar: #0b121e;
   --sidebar-foreground: #f1f5f9;
   --sidebar-border: rgb(255 255 255 / 10%);
@@ -544,7 +549,7 @@
 }
 
 .drive-shell .drive-search-input {
-  background-color: var(--drive-search-bg);
+  background: var(--light-gradient-bg);
   border-color: transparent;
 }
 
@@ -555,3 +560,9 @@
 .drive-shell .drive-link:hover {
   color: color-mix(in oklch, var(--primary) 85%, black);
 }
+
+.drive-folder-fill {
+  fill: var(--drive-folder-fill);
+}
+
+/* Drive explorer (Owned by me) — light design (matches screenshot) */

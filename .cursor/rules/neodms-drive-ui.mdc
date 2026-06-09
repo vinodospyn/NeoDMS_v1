@@ -47,8 +47,8 @@ Do not add upload CTA to header; **+ New** belongs on file explorer toolbar only
 ## Dashboard (`DriveDashboardPage`)
 
 - `QuickAccessSection`: 2×5 grid (`xl:grid-cols-5`), cards 60px tall, `#f2f4f7`
-- Folder icon: blue folder + centered white star (`QuickAccessItemIcon`)
-- Files: blue “W” tile (docx), red “PDF” tile
+- Icons: `FileTypeIcon` (Lucide only) — `variant="brand"` on dashboard, `variant="compact"` in lists
+- Kinds: `features/drive/lib/file-types.ts` (`Folder`, `FileText`, `Presentation`, etc.)
 - `Recent Files`: white bordered cards, preview block, optional HR/Finance tag, timestamp footer
 
 ## File Explorer (`FileExplorerPage`)
@@ -59,5 +59,4 @@ Do not add upload CTA to header; **+ New** belongs on file explorer toolbar only
 ## Do Not
 
 - Reintroduce e-stamp “Upgrade Pro” card in sidebar footer (use storage meter).
-- Use `neo-table` / `request-row` for drive file lists.
-- Change `(with-header)` `/dashboard` when implementing drive — that is a separate template demo.
+- Use legacy request-table patterns for drive file lists — use `FileExplorerTable` only.

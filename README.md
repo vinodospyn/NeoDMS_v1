@@ -1,6 +1,6 @@
 # NeoDMS (Ospyn Neo My Drive)
 
-Next.js document-management UI with a **Neo Drive** shell (sidebar + dashboard) and preserved **multi-layout template** demos.
+Next.js document-management UI with a **Neo Drive** shell (sidebar + dashboard) as the default product.
 
 ## Start Here
 
@@ -23,11 +23,7 @@ pnpm dev
 
 Open **http://localhost:3000/** — DMS dashboard (default).
 
-Other entry points:
-
-- `/sample-sidebar/documents` — Owned by me (file explorer)
-- `/dashboard` — template header-shell demo (requests table)
-- `/ui-showcase` — component gallery
+Drive routes: `/`, `/owned-by-me`, `/shared-with-me`, `/shared-by-me`, `/quick-access`, `/recent`, `/trash`, `/settings`.
 
 ## Commands
 

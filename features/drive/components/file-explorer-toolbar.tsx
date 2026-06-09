@@ -1,92 +1,182 @@
 "use client"
 
+import * as React from "react"
 import {
   ArrowDownUp,
-  Filter,
   Grid3x3,
   Info,
   List,
   Plus,
   Search,
+  SlidersHorizontal,
 } from "lucide-react"
 
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
+import { cn } from "@/lib/utils"
+import { FolderTreeToggleIcon } from "@/features/drive/components/folder-tree-toggle-icon"
+import { explorerFolderToggleClass } from "@/features/drive/lib/explorer-layout"
+
+type ExplorerViewMode = "list" | "grid"
 
 type FileExplorerToolbarProps = {
   folderSearch: string
   onFolderSearchChange: (value: string) => void
+  myFoldersOpen: boolean
+  onToggleMyFolders: () => void
+  certificationOpen: boolean
+  onToggleCertification: () => void
+}
+
+function ToolbarDivider() {
+  return <span className="mx-1 h-5 w-px shrink-0 bg-border/80" aria-hidden />
 }
 
 export function FileExplorerToolbar({
   folderSearch,
   onFolderSearchChange,
+  myFoldersOpen,
+  onToggleMyFolders,
+  certificationOpen,
+  onToggleCertification,
 }: FileExplorerToolbarProps) {
+  const [viewMode, setViewMode] = React.useState<ExplorerViewMode>("list")
+
   return (
-    <div className="flex flex-col gap-3 border-b border-border/70 px-4 py-3 sm:flex-row sm:items-center sm:justify-between">
-      <div className="relative min-w-0 flex-1 sm:max-w-sm">
-        <Search
-          className="pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2 text-muted-foreground"
-          aria-hidden
-        />
-        <Input
-          type="search"
-          value={folderSearch}
-          onChange={(event) => onFolderSearchChange(event.target.value)}
-          placeholder="Search in selected folder"
-          className="h-9 bg-muted/40 pl-9"
-        />
+    <div className="flex shrink-0 items-center justify-between gap-2 border-b border-border/60 bg-background px-3 py-2.5">
+      <div className="flex items-center gap-2">
+        <Button
+          type="button"
+          variant="ghost"
+          size="icon-sm"
+          className={cn(
+            explorerFolderToggleClass,
+            myFoldersOpen && "ring-2 ring-primary/20"
+          )}
+          aria-label={myFoldersOpen ? "Close My Folders" : "Open My Folders"}
+          aria-pressed={myFoldersOpen}
+          aria-expanded={myFoldersOpen}
+          onClick={onToggleMyFolders}
+        >
+          <FolderTreeToggleIcon />
+        </Button>
+
+        <div className="relative w-full flex-1">
+          <Search
+            className="pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2 text-muted-foreground"
+            aria-hidden
+          />
+          <Input
+            type="search"
+            value={folderSearch}
+            onChange={(event) => onFolderSearchChange(event.target.value)}
+            placeholder="Search in selected folder"
+            className="h-9 rounded-lg border-border/70 pr-11 pl-9 shadow-none"
+          />
+          <Button
+            type="button"
+            variant="ghost"
+            size="icon-sm"
+            className="absolute top-1/2 right-1 size-7 -translate-y-1/2 rounded-md bg-(--drive-search-bg) text-primary hover:bg-[#dce8f5]"
+            aria-label="Search folder"
+          >
+            <Search className="size-3.5" strokeWidth={2.25} aria-hidden />
+          </Button>
+        </div>
       </div>
-      <div className="flex shrink-0 items-center gap-1">
+      <div className="flex items-center gap-2">
+        <div
+          className="flex shrink-0 items-center rounded-lg border border-border/60 bg-muted/25 p-0.5"
+          role="group"
+          aria-label="View mode"
+        >
+          <Button
+            type="button"
+            variant="ghost"
+            size="icon-sm"
+            className={cn(
+              "size-7 rounded-md",
+              viewMode === "list"
+                ? "bg-background text-foreground shadow-sm"
+                : "text-muted-foreground hover:text-foreground"
+            )}
+            aria-label="List view"
+            aria-pressed={viewMode === "list"}
+            onClick={() => setViewMode("list")}
+          >
+            <List className="size-4" />
+          </Button>
+          <Button
+            type="button"
+            variant="ghost"
+            size="icon-sm"
+            className={cn(
+              "size-7 rounded-md",
+              viewMode === "grid"
+                ? "bg-background text-foreground shadow-sm"
+                : "text-muted-foreground hover:text-foreground"
+            )}
+            aria-label="Grid view"
+            aria-pressed={viewMode === "grid"}
+            onClick={() => setViewMode("grid")}
+          >
+            <Grid3x3 className="size-4" />
+          </Button>
+        </div>
+
         <Button
           type="button"
-          variant="ghost"
-          size="icon-sm"
-          className="text-muted-foreground"
-          aria-label="Sort"
+          size="sm"
+          className="primary-button h-9 shrink-0 gap-1.5 px-4"
         >
-          <ArrowDownUp className="size-4" />
-        </Button>
-        <Button
-          type="button"
-          variant="ghost"
-          size="icon-sm"
-          className="text-muted-foreground"
-          aria-label="Filter"
-        >
-          <Filter className="size-4" />
-        </Button>
-        <Button
-          type="button"
-          variant="ghost"
-          size="icon-sm"
-          className="text-muted-foreground"
-          aria-label="Information"
-        >
-          <Info className="size-4" />
-        </Button>
-        <Button
-          type="button"
-          variant="secondary"
-          size="icon-sm"
-          className="bg-muted text-foreground"
-          aria-label="List view"
-        >
-          <List className="size-4" />
-        </Button>
-        <Button
-          type="button"
-          variant="ghost"
-          size="icon-sm"
-          className="text-muted-foreground"
-          aria-label="Grid view"
-        >
-          <Grid3x3 className="size-4" />
-        </Button>
-        <Button type="button" size="sm" className="primary-button ml-1 h-9 gap-1.5 px-4">
           <Plus className="size-4" />
           New
         </Button>
+
+        <div className="flex shrink-0 items-center">
+          <ToolbarDivider />
+          <Button
+            type="button"
+            variant="ghost"
+            size="icon-sm"
+            className="size-8 text-muted-foreground hover:text-foreground"
+            aria-label="Sort"
+          >
+            <ArrowDownUp className="size-4" />
+          </Button>
+          <ToolbarDivider />
+          <Button
+            type="button"
+            variant="ghost"
+            size="icon-sm"
+            className="size-8 text-muted-foreground hover:text-foreground"
+            aria-label="Filter"
+          >
+            <SlidersHorizontal className="size-4" />
+          </Button>
+          <ToolbarDivider />
+          <Button
+            type="button"
+            variant="ghost"
+            size="icon-sm"
+            className={cn(
+              "size-8 transition-all duration-200",
+              certificationOpen
+                ? "bg-primary/10 text-primary ring-2 ring-primary/20"
+                : "text-muted-foreground hover:text-foreground"
+            )}
+            aria-label={
+              certificationOpen
+                ? "Close certificates panel"
+                : "Open certificates panel"
+            }
+            aria-pressed={certificationOpen}
+            aria-expanded={certificationOpen}
+            onClick={onToggleCertification}
+          >
+            <Info className="size-4" aria-hidden />
+          </Button>
+        </div>
       </div>
     </div>
   )

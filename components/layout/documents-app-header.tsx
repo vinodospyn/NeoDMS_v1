@@ -2,14 +2,7 @@
 
 import * as React from "react"
 import { usePathname } from "next/navigation"
-import {
-  Bell,
-  ChevronDown,
-  Palette,
-  Search,
-  Sparkles,
-  X,
-} from "lucide-react"
+import { Bell, ChevronDown, Palette, Search, Sparkles, X } from "lucide-react"
 
 import { ThemeManager } from "@/components/theme-manager"
 import { appConfig } from "@/config/app"
@@ -23,15 +16,13 @@ import { isNavItemActive } from "@/lib/navigation"
 
 const ROUTE_TITLES: Record<string, string> = {
   "/": "Dashboard",
-  "/sample-sidebar/documents": "Owned by me",
-  "/sample-sidebar/shared-with-me": "Shared with me",
-  "/sample-sidebar/shared-by-me": "Shared by me",
-  "/sample-sidebar/quick-access": "Quick access",
-  "/sample-sidebar/recent": "Recent",
-  "/sample-sidebar/trash": "Trash",
-  "/sample-sidebar/settings": "Settings",
-  "/sample-sidebar/templates": "Templates",
-  "/sample-sidebar/archive": "Archive",
+  "/owned-by-me": "Owned by me",
+  "/shared-with-me": "Shared with me",
+  "/shared-by-me": "Shared by me",
+  "/quick-access": "Quick access",
+  "/recent": "Recent",
+  "/trash": "Trash",
+  "/settings": "Settings",
 }
 
 function getPageTitle(pathname: string): string {
@@ -47,7 +38,7 @@ function DriveSearchBar({ className }: { className?: string }) {
   return (
     <div className={className}>
       <Search
-        className="pointer-events-none absolute top-1/2 left-3.5 size-4 -translate-y-1/2 text-muted-foreground"
+        className="pointer-events-none absolute top-1/2 left-3.5 size-4 -translate-y-1/2 border-border/70 text-primary opacity-50"
         aria-hidden
       />
       <Input
@@ -55,7 +46,7 @@ function DriveSearchBar({ className }: { className?: string }) {
         value={query}
         onChange={(event) => setQuery(event.target.value)}
         placeholder="Search in Neo Drive"
-        className="drive-search-input h-10 rounded-full border-transparent pr-20 pl-10 text-sm shadow-none"
+        className="drive-search-input h-11 rounded-full border border-border/70 pr-20 pl-10 text-sm text-primary shadow-none placeholder:text-primary/50"
       />
       {query ? (
         <Button
@@ -85,8 +76,8 @@ export function DocumentsAppHeader() {
 
   return (
     <header className="border-b border-border/70 bg-background">
-      <div className="mx-auto w-full max-w-[1400px] px-6 md:px-8">
-        <div className="flex h-14 items-center gap-2 md:hidden">
+      <div className="mx-auto flex w-full flex-col gap-1 px-4">
+        <div className="flex h-14 items-center gap-1 md:hidden">
           <SidebarTrigger className="shrink-0" />
           <p className="min-w-0 truncate text-sm font-medium text-foreground">
             {pageTitle}
@@ -95,18 +86,18 @@ export function DocumentsAppHeader() {
             <HeaderActions initials={initials} compact />
           </div>
         </div>
-        <div className="relative pb-3 md:hidden">
+        <div className="relative w-full pb-3 md:hidden">
           <DriveSearchBar className="relative w-full" />
         </div>
 
         <div className="hidden h-16 grid-cols-[minmax(0,1fr)_minmax(240px,1fr)_auto] items-center gap-4 lg:grid xl:grid-cols-[220px_minmax(320px,1fr)_auto]">
-          <div className="flex min-w-0 items-center gap-3">
+          <div className="flex min-w-0 items-center gap-1">
             <SidebarTrigger className="shrink-0" />
             <p className="truncate text-sm font-medium text-foreground">
               {pageTitle}
             </p>
           </div>
-          <DriveSearchBar className="relative w-full max-w-xl justify-self-center lg:max-w-none" />
+          <DriveSearchBar className="relative w-full max-w-lg justify-self-center" />
           <HeaderActions initials={initials} />
         </div>
       </div>

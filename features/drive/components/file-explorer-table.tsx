@@ -26,7 +26,7 @@ import {
 } from "@/components/ui/table"
 import { cn } from "@/lib/utils"
 import { mockDriveItems } from "@/features/drive/data/mock-files"
-import { DriveItemIcon } from "@/features/drive/components/drive-item-icon"
+import { FileTypeIcon } from "@/features/drive/components/file-type-icon/file-type-icon"
 import type { DriveItem, DriveSortDirection, DriveSortKey } from "@/features/drive/types"
 
 const ROWS_PER_PAGE = 10
@@ -62,20 +62,33 @@ type FileExplorerTableProps = {
   /** When true, renders inside `FileExplorerPage` shell (no outer card). */
   embedded?: boolean
   folderSearch?: string
+  selectedId?: string
+  onSelectedIdChange?: (id: string) => void
 }
 
 export function FileExplorerTable({
   embedded = false,
   folderSearch = "",
+  selectedId: selectedIdProp,
+  onSelectedIdChange,
 }: FileExplorerTableProps) {
   const [items] = React.useState(mockDriveItems)
-  const [selectedId, setSelectedId] = React.useState<string>("2")
+  const [selectedIdState, setSelectedIdState] = React.useState<string>("2")
   const [selectedIds, setSelectedIds] = React.useState<Set<string>>(new Set())
   const [sortKey, setSortKey] = React.useState<DriveSortKey>("name")
   const [sortDirection, setSortDirection] =
     React.useState<DriveSortDirection>("asc")
   const [page, setPage] = React.useState(1)
   const [goToPage, setGoToPage] = React.useState("")
+  const selectedId = selectedIdProp ?? selectedIdState
+
+  const setSelectedId = React.useCallback(
+    (id: string) => {
+      setSelectedIdState(id)
+      onSelectedIdChange?.(id)
+    },
+    [onSelectedIdChange]
+  )
 
   const filtered = React.useMemo(() => {
     const term = folderSearch.trim().toLowerCase()
@@ -130,8 +143,8 @@ export function FileExplorerTable({
 
   const table = (
     <>
-      <div className="min-h-0 flex-1 overflow-x-auto overflow-y-auto">
-      <Table className="min-w-[960px]">
+      <div className="min-h-0 w-full max-w-full flex-1 overflow-auto">
+      <Table className="min-w-[960px] w-full">
         <TableHeader>
           <TableRow className="hover:bg-transparent">
             <TableHead className="w-12">
@@ -191,7 +204,12 @@ export function FileExplorerTable({
                 </TableCell>
                 <TableCell className="py-2">
                   <div className="flex items-center gap-2.5">
-                    <DriveItemIcon type={item.type} />
+                    <FileTypeIcon
+                      name={item.name}
+                      explicitType={item.type}
+                      variant="compact"
+                      size="md"
+                    />
                     <span className="font-medium text-foreground">{item.name}</span>
                   </div>
                 </TableCell>
@@ -254,7 +272,7 @@ export function FileExplorerTable({
         </TableBody>
       </Table>
       </div>
-      <TableFooterBar className="mt-auto shrink-0 border-t">
+      <TableFooterBar className="mt-auto shrink-0 border-t border-border/60 bg-background px-4 py-2.5">
         <p className="text-sm text-muted-foreground">
           Showing {pageStart}-{pageEnd} of {sorted.length}
         </p>
@@ -322,7 +340,9 @@ export function FileExplorerTable({
 
   if (embedded) {
     return (
-      <div className="flex min-h-0 flex-1 flex-col overflow-hidden">{table}</div>
+      <div className="flex min-h-0 w-full max-w-full flex-1 flex-col overflow-hidden">
+        {table}
+      </div>
     )
   }
 

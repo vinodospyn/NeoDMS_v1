@@ -2,21 +2,19 @@
 
 NeoDMS tables follow the **Ospyn Neo Drive** explorer design: light card shell, muted header row, sky-blue row selection, sortable column headers, and a footer with range text plus pagination (including “Go to page”).
 
-This project uses three table patterns:
+This project uses two table patterns:
 
 1. **Base primitives** — `components/ui/table.tsx` (default styling for all tables)
 2. **Drive file explorer** — `features/drive/components/file-explorer-table.tsx` (Owned-by-me list UI)
-3. **Dashboard requests** — `features/dashboard/components/neo-table.tsx` (e-sign / request workflow rows)
 
 ## Quick Decision Rule
 
 | Need | Use |
 |------|-----|
 | File/folder lists (DMS explorer) | `FileExplorerTable` or compose base primitives like it |
-| Request tracking (badges, signers, stamp blocks) | `NeoTable` + `request-row.tsx` |
 | Simple one-off lists | Base `Table` + `TableContainer` |
 
-Do **not** use `neo-table` / `request-row` for drive file lists. Do **not** put drive-specific columns into `components/ui/table.tsx`.
+Do **not** put drive-specific columns into `components/ui/table.tsx`.
 
 ---
 
@@ -109,13 +107,13 @@ Implements the **Owned by me** file list from the DMS UI: checkbox, name with ty
 ### Sources
 
 - `features/drive/components/file-explorer-table.tsx`
-- `features/drive/components/drive-item-icon.tsx`
+- `features/drive/components/file-type-icon/file-type-icon.tsx`
 - `features/drive/data/mock-files.ts`
 - `features/drive/types.ts`
 
 ### Route reference
 
-`/sample-sidebar/documents` renders `<FileExplorerPage />` (breadcrumbs, toolbar, and `<FileExplorerTable embedded />`).
+`/owned-by-me` renders `<FileExplorerPage />` (breadcrumbs, toolbar, and `<FileExplorerTable embedded />`).
 
 ### Columns
 
@@ -155,36 +153,6 @@ When the API is ready, keep this component and replace `mockDriveItems` with hoo
 
 ---
 
-## 3) Neo Table (Request Workflow)
-
-### Purpose
-
-Rich dashboard table for **request** tracking (not drive files): channel badges, document counts, signer avatars, stamp blocks, status timeline, row action menu, and inset vertical separators between logical columns.
-
-### Sources
-
-- `features/dashboard/components/neo-table.tsx`
-- `features/dashboard/components/request-row.tsx`
-- `features/dashboard/components/requests-filters.tsx`
-
-### Visual differences from drive table
-
-- Custom `<td>` layout in `request-row.tsx` (not standard `TableCell` children)
-- Inset vertical separators via `before:` pseudo-elements on cells
-- Filters rendered above the table inside the same `TableContainer`
-
-### Usage
-
-```tsx
-import { NeoTable } from "@/features/dashboard/components/neo-table"
-
-export function RequestsDashboardTab() {
-  return <NeoTable />
-}
-```
-
----
-
 ## Extension Guidelines
 
 - Prefer **base primitives** + `TableContainer` for new list pages.
@@ -203,13 +171,7 @@ export function RequestsDashboardTab() {
 - `features/drive/data/mock-files.ts`
 - `file-explorer-table.tsx` column mapping
 
-**Request table changes**
-
-- `features/dashboard/types.ts`
-- `features/dashboard/data/requests.ts`
-- `request-row.tsx`
-
 **Global table look-and-feel**
 
 - `components/ui/table.tsx` (affects all consumers)
-- Re-verify `/` (dashboard), `/sample-sidebar/documents` (explorer), `(with-header)` `/dashboard` (neo-table), and `/ui-showcase` table block
+- Re-verify `/` (drive dashboard) and `/owned-by-me` (explorer)

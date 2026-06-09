@@ -4,11 +4,11 @@ Design reference for the **Ospyn Neo My Drive** shell implemented in `(with-side
 
 ## Scope
 
-| In scope | Out of scope (template demos) |
-|----------|-------------------------------|
-| `/` dashboard | `(with-header)` `/dashboard` requests table |
-| `/sample-sidebar/documents` explorer | `/learn-minimal` unless linked from marketing |
-| Sidebar + `DocumentsAppHeader` | `/ui-showcase` |
+| In scope | Out of scope |
+|----------|--------------|
+| `/` dashboard | `(with-header)` / `(minimal)` shells without pages yet |
+| `/owned-by-me` explorer | Legacy template demo routes (removed) |
+| Sidebar + `DocumentsAppHeader` | — |
 
 Drive styling is scoped via `.drive-shell` on `SidebarProvider` (`app/(with-sidebar)/layout.tsx`).
 
@@ -50,7 +50,7 @@ Drive styling is scoped via `.drive-shell` on `SidebarProvider` (`app/(with-side
 | Sidebar | `components/layout/app-sidebar.tsx` |
 | Header | `components/layout/documents-app-header.tsx` |
 | Dashboard | `features/drive/components/drive-dashboard-page.tsx` |
-| Quick access | `quick-access-section.tsx`, `quick-access-card.tsx`, `quick-access-item-icon.tsx` |
+| Quick access | `quick-access-section.tsx`, `quick-access-card.tsx`, `file-type-icon.tsx` |
 | Recent files | `recent-file-card.tsx` |
 | File explorer | `file-explorer-page.tsx`, `file-explorer-toolbar.tsx`, `file-explorer-table.tsx` |
 | Branding config | `config/app.ts` |
@@ -59,9 +59,9 @@ Drive styling is scoped via `.drive-shell` on `SidebarProvider` (`app/(with-side
 ## Dashboard — Quick Access
 
 - **10 items**, 5 columns × 2 rows at `xl`
-- **Folders:** blue folder icon with white star centered
-- **Files:** Word (`W` on `#2b579a`), PDF (red `PDF` badge)
-- **View more** → `/sample-sidebar/quick-access`
+- **Folders:** Lucide `Folder` (filled) + `Star` for shared folders
+- **Files:** Lucide icons per type (`FileText`, `Presentation`, `FileArchive`, etc.)
+- **View more** → `/quick-access`
 
 Mock data: `features/drive/data/mock-dashboard.ts` → `quickAccessItems`.
 
@@ -73,7 +73,7 @@ Mock data: `features/drive/data/mock-dashboard.ts` → `quickAccessItems`.
 
 ## File Explorer — Owned by Me
 
-Route: `/sample-sidebar/documents`
+Route: `/owned-by-me`
 
 1. Breadcrumb trail (e.g. My Files › On-boarding › …)
 2. Toolbar: “Search in selected folder”, view/sort/filter icons, green **+ New**

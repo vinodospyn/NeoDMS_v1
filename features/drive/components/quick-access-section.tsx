@@ -14,7 +14,7 @@ export function QuickAccessSection() {
           Quick access
         </h2>
         <Link
-          href="/sample-sidebar/quick-access"
+          href="/quick-access"
           className="drive-link text-sm font-medium hover:underline"
         >
           View more
