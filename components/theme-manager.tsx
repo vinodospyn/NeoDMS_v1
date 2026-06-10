@@ -6,14 +6,9 @@ import {
   CircleDot,
   Monitor,
   Moon,
-  Palette,
   Settings2,
-  Sparkles,
   Sun,
-  Type,
-  Zap,
 } from "lucide-react"
-import { motion as MotionElement } from "framer-motion"
 import { useTheme } from "next-themes"
 import { Button } from "@/components/ui/button"
 import {
@@ -45,13 +40,13 @@ type Radius = ThemeRadius
 type Motion = ThemeMotion
 type Scale = ThemeScale
 
-const ACCENT_OPTIONS: Array<{ id: Accent; previewClass: string; glowClass: string }> = [
-  { id: "slate", previewClass: "bg-slate-500", glowClass: "shadow-slate-500/50" },
-  { id: "emerald", previewClass: "bg-emerald-500", glowClass: "shadow-emerald-500/50" },
-  { id: "navy", previewClass: "bg-blue-700", glowClass: "shadow-blue-700/50" },
-  { id: "amethyst", previewClass: "bg-purple-500", glowClass: "shadow-purple-500/50" },
-  { id: "teal", previewClass: "bg-cyan-500", glowClass: "shadow-cyan-500/50" },
-  { id: "zinc", previewClass: "bg-zinc-500", glowClass: "shadow-zinc-500/50" },
+const ACCENT_OPTIONS: Array<{ id: Accent; previewClass: string }> = [
+  { id: "slate", previewClass: "bg-slate-500" },
+  { id: "emerald", previewClass: "bg-emerald-500" },
+  { id: "navy", previewClass: "bg-blue-700" },
+  { id: "amethyst", previewClass: "bg-purple-500" },
+  { id: "teal", previewClass: "bg-cyan-500" },
+  { id: "zinc", previewClass: "bg-zinc-500" },
 ]
 
 const RADIUS_OPTIONS: Array<{ id: Radius; label: string }> = [
@@ -60,42 +55,185 @@ const RADIUS_OPTIONS: Array<{ id: Radius; label: string }> = [
   { id: "comfortable", label: "Comfortable" },
 ]
 
-const SCALE_OPTIONS: Array<{ id: Scale; label: string; preview: string }> = [
-  { id: "sm", label: "Small", preview: "90%" },
-  { id: "md", label: "Default", preview: "100%" },
-  { id: "lg", label: "Large", preview: "110%" },
+const SCALE_OPTIONS: Array<{ id: Scale; label: string }> = [
+  { id: "sm", label: "Small" },
+  { id: "md", label: "Default" },
+  { id: "lg", label: "Large" },
+]
+
+const MOTION_OPTIONS: Array<{ id: Motion; label: string }> = [
+  { id: "default", label: "Smooth" },
+  { id: "reduced", label: "Reduced" },
 ]
 
 const MODE_OPTIONS = [
   {
     id: "light" as const,
     label: "Light",
-    description: "Clean daytime canvas",
     icon: Sun,
     iconClass: "text-amber-500",
+    iconBgClass: "bg-amber-500/10",
   },
   {
     id: "dark" as const,
     label: "Dark",
-    description: "Focused low-glare mode",
     icon: Moon,
     iconClass: "text-indigo-400",
+    iconBgClass: "bg-indigo-500/10",
   },
   {
     id: "semi-dark" as const,
     label: "Semi dark",
-    description: "Light content, dark sidebar",
     icon: CircleDot,
     iconClass: "text-violet-400",
+    iconBgClass: "bg-violet-500/10",
   },
   {
     id: "system" as const,
     label: "System",
-    description: "Follow device setting",
     icon: Monitor,
-    iconClass: "text-sky-400",
+    iconClass: "text-sky-500",
+    iconBgClass: "bg-sky-500/10",
   },
 ]
+
+function ActiveThemeSummary({
+  modeLabel,
+  modeOption,
+  accentOption,
+}: {
+  modeLabel: string
+  modeOption: (typeof MODE_OPTIONS)[number]
+  accentOption: (typeof ACCENT_OPTIONS)[number]
+}) {
+  const ModeIcon = modeOption.icon
+
+  return (
+    <div className="border-b border-border/60 pb-4">
+      <p className="mb-2.5 text-[11px] font-medium uppercase tracking-wide text-muted-foreground">
+        Active theme
+      </p>
+      <div className="flex flex-wrap items-center gap-x-3 gap-y-2 text-sm">
+        <span className="inline-flex items-center gap-2 text-foreground">
+          <span
+            className={cn(
+              "inline-flex size-7 shrink-0 items-center justify-center rounded-md",
+              modeOption.iconBgClass
+            )}
+          >
+            <ModeIcon className={cn("size-3.5", modeOption.iconClass)} strokeWidth={2} />
+          </span>
+          <span className="font-medium">{modeLabel}</span>
+        </span>
+
+        <span className="text-border" aria-hidden>
+          ·
+        </span>
+
+        <span className="inline-flex items-center gap-2 text-foreground">
+          <span
+            className={cn(
+              "size-3.5 shrink-0 rounded-full ring-1 ring-border/60 ring-offset-1 ring-offset-background",
+              accentOption.previewClass
+            )}
+            aria-hidden
+          />
+          <span className="font-medium capitalize">{accentOption.id}</span>
+        </span>
+      </div>
+    </div>
+  )
+}
+
+function SettingSection({
+  title,
+  children,
+  className,
+}: {
+  title: string
+  children: React.ReactNode
+  className?: string
+}) {
+  return (
+    <section className={cn("border-b border-border/60 py-4", className)}>
+      <h3 className="mb-3 text-xs font-medium text-muted-foreground">{title}</h3>
+      {children}
+    </section>
+  )
+}
+
+function SettingRow({
+  label,
+  description,
+  icon: Icon,
+  isActive,
+  onClick,
+}: {
+  label: string
+  description?: string
+  icon?: React.ComponentType<{ className?: string }>
+  isActive: boolean
+  onClick: () => void
+}) {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      className={cn(
+        "flex w-full items-center gap-3 border-b border-border/40 py-2.5 text-left last:border-b-0",
+        "transition-colors hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2",
+        isActive ? "text-foreground" : "text-muted-foreground"
+      )}
+    >
+      {Icon ? <Icon className="size-4 shrink-0" /> : null}
+      <span className="min-w-0 flex-1">
+        <span className="block text-sm">{label}</span>
+        {description ? (
+          <span className="block text-xs text-muted-foreground">{description}</span>
+        ) : null}
+      </span>
+      {isActive ? (
+        <Check className="size-4 shrink-0 text-primary" strokeWidth={2.5} />
+      ) : (
+        <span className="size-4 shrink-0" aria-hidden />
+      )}
+    </button>
+  )
+}
+
+function SettingSegment({
+  options,
+  value,
+  onChange,
+}: {
+  options: Array<{ id: string; label: string }>
+  value: string
+  onChange: (id: string) => void
+}) {
+  return (
+    <div className="flex flex-wrap gap-1">
+      {options.map((option) => {
+        const isActive = value === option.id
+
+        return (
+          <button
+            key={option.id}
+            type="button"
+            onClick={() => onChange(option.id)}
+            className={cn(
+              "rounded-md px-3 py-1.5 text-sm transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2",
+              isActive
+                ? "bg-muted font-medium text-foreground"
+                : "text-muted-foreground hover:bg-muted/60 hover:text-foreground"
+            )}
+          >
+            {option.label}
+          </button>
+        )
+      })}
+    </div>
+  )
+}
 
 export function ThemeManager({ trigger }: { trigger: React.ReactNode }) {
   const { theme, setTheme, resolvedTheme } = useTheme()
@@ -127,6 +265,7 @@ export function ThemeManager({ trigger }: { trigger: React.ReactNode }) {
       "md"
     )
   )
+
   React.useEffect(() => {
     applyThemeAccent(accent)
     applyThemeRadius(radius)
@@ -138,287 +277,135 @@ export function ThemeManager({ trigger }: { trigger: React.ReactNode }) {
     persistThemePreference(THEME_STORAGE_KEYS.scale, scale)
   }, [accent, motion, radius, scale])
 
-  function onAccentChange(nextAccent: Accent) {
-    setAccent(nextAccent)
-  }
-
-  function onRadiusChange(nextRadius: Radius) {
-    setRadius(nextRadius)
-  }
-
-  function onMotionChange(nextMotion: Motion) {
-    setMotion(nextMotion)
-  }
-
-  function onScaleChange(nextScale: Scale) {
-    setScale(nextScale)
-  }
-
   function resetThemePreferences() {
-    onAccentChange("emerald")
-    onRadiusChange("default")
-    onMotionChange("default")
-    onScaleChange("md")
+    setAccent("emerald")
+    setRadius("default")
+    setMotion("default")
+    setScale("md")
     setTheme("system")
   }
 
   const activeTheme = (theme ?? "system") as ThemeMode
+  const activeModeOption =
+    MODE_OPTIONS.find((option) => option.id === activeTheme) ?? MODE_OPTIONS[3]
+  const activeAccentOption =
+    ACCENT_OPTIONS.find((option) => option.id === accent) ?? ACCENT_OPTIONS[1]
   const currentModeLabel =
-    activeTheme === "semi-dark"
-      ? "semi dark"
-      : activeTheme === "system"
-        ? resolvedTheme ?? "system"
-        : activeTheme
+    activeTheme === "system"
+      ? resolvedTheme === "dark"
+        ? "System (dark)"
+        : "System (light)"
+      : activeModeOption.label
 
   return (
     <Sheet>
       <SheetTrigger asChild>{trigger}</SheetTrigger>
-      <SheetContent
-        side="right"
-        className="overflow-y-auto bg-linear-to-b from-background to-muted/30 sm:max-w-md"
-      >
+      <SheetContent side="right" className="overflow-y-auto sm:max-w-md">
         <SheetHeader>
-          <SheetTitle className="flex items-center gap-2">
+          <SheetTitle className="flex items-center gap-2 text-base">
             <Settings2 className="size-4" />
             Theme manager
           </SheetTitle>
           <SheetDescription>
-            Personalize appearance with live previews. Changes apply instantly across the app.
+            Appearance preferences apply instantly across the app.
           </SheetDescription>
         </SheetHeader>
 
-        <div className="flex-1 space-y-4 px-4 pb-4 pt-3">
-          <div className="flex items-center justify-between rounded-xl border bg-card/70 px-3 py-2.5 text-xs text-muted-foreground">
-            <span className="inline-flex items-center gap-1.5">
-              <span className="size-1.5 rounded-full bg-primary" />
-              <span className="capitalize">{currentModeLabel}</span>
-            </span>
-            <span className="h-3.5 w-px bg-border" />
-            <span className="capitalize">{accent}</span>
-          </div>
+        <div className="px-4 pb-6 pt-2">
+          <ActiveThemeSummary
+            modeLabel={currentModeLabel}
+            modeOption={activeModeOption}
+            accentOption={activeAccentOption}
+          />
 
-          <section className="space-y-3 rounded-2xl border bg-card/80 p-4 shadow-sm backdrop-blur">
-            <h3 className="text-sm font-semibold tracking-tight">Appearance mode</h3>
-            <div className="rounded-xl border bg-background/70 p-1.5">
-              <div className="grid grid-cols-2 gap-1.5">
-                {MODE_OPTIONS.map((option) => {
-                  const isActive = activeTheme === option.id
-                  const Icon = option.icon
+          <SettingSection title="Appearance">
+            {MODE_OPTIONS.map((option) => (
+              <SettingRow
+                key={option.id}
+                label={option.label}
+                icon={option.icon}
+                isActive={activeTheme === option.id}
+                onClick={() => setTheme(option.id)}
+              />
+            ))}
+          </SettingSection>
 
-                  return (
-                    <MotionElement.button
-                      key={option.id}
-                      type="button"
-                      onClick={() => setTheme(option.id)}
-                      whileTap={{ scale: 0.98 }}
-                      transition={{ type: "spring", stiffness: 360, damping: 26 }}
-                      className={cn(
-                        "relative min-h-20 overflow-hidden rounded-lg border p-3 text-left transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2",
-                        isActive
-                          ? "border-primary/35 bg-card shadow-sm"
-                          : "border-transparent bg-transparent hover:border-border/70 hover:bg-muted/50"
-                      )}
-                    >
-                      {isActive ? (
-                        <MotionElement.span
-                          layoutId="active-theme-pill"
-                          className="absolute inset-0 rounded-lg bg-linear-to-br from-primary/10 via-primary/5 to-transparent"
-                          transition={{ type: "spring", stiffness: 340, damping: 28 }}
-                        />
-                      ) : null}
-                      <span className="relative z-10 flex items-start justify-between gap-2">
-                        <span className="space-y-1">
-                          <span className="flex items-center gap-2 text-sm font-medium">
-                            <span
-                              className={cn(
-                                "inline-flex size-6 items-center justify-center rounded-md bg-background shadow-xs",
-                                option.iconClass
-                              )}
-                            >
-                              <Icon className="size-3.5" />
-                            </span>
-                            {option.label}
-                          </span>
-                          <span className="block text-[11px] leading-relaxed text-muted-foreground">
-                            {option.description}
-                          </span>
-                        </span>
-                        {isActive ? (
-                          <MotionElement.span
-                            initial={{ scale: 0.7, opacity: 0.35 }}
-                            animate={{ scale: 1, opacity: 1 }}
-                            transition={{ duration: 0.18, ease: "easeOut" }}
-                            className="inline-flex size-5 shrink-0 items-center justify-center rounded-full bg-primary text-primary-foreground shadow-sm"
-                          >
-                            <Check className="size-3.5" />
-                          </MotionElement.span>
-                        ) : null}
-                      </span>
-                    </MotionElement.button>
-                  )
-                })}
-              </div>
-            </div>
-          </section>
+          <SettingSection title="Accent">
+            <div className="flex flex-wrap items-center gap-3">
+              {ACCENT_OPTIONS.map((option) => {
+                const isActive = accent === option.id
 
-          <section className="space-y-3 rounded-2xl border bg-card/80 p-4 shadow-sm backdrop-blur">
-            <h3 className="text-sm font-semibold tracking-tight">Accent palette</h3>
-            <div className="grid grid-cols-6 gap-2">
-              {ACCENT_OPTIONS.map((option) => (
-                <MotionElement.button
-                  key={option.id}
-                  type="button"
-                  aria-label={`Use ${option.id} accent`}
-                  whileTap={{ scale: 0.97 }}
-                  className={cn(
-                    "group relative flex h-12 w-full items-center justify-center rounded-xl border bg-background/85 transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2",
-                    accent === option.id
-                      ? "border-primary/40 shadow-sm ring-2 ring-primary/25"
-                      : "border-border hover:border-border/80 hover:bg-muted/40"
-                  )}
-                  onClick={() => onAccentChange(option.id)}
-                >
-                  <span
+                return (
+                  <button
+                    key={option.id}
+                    type="button"
+                    aria-label={`Use ${option.id} accent`}
+                    aria-pressed={isActive}
+                    onClick={() => setAccent(option.id)}
                     className={cn(
-                      "size-6 rounded-full shadow-[0_0_0_1px_hsl(var(--background))] transition-transform group-hover:scale-105",
-                      option.previewClass,
-                      option.glowClass
+                      "flex items-center gap-2 rounded-md py-1 pr-2 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2",
+                      isActive ? "text-foreground" : "text-muted-foreground hover:text-foreground"
                     )}
-                  />
-                  {accent === option.id ? (
-                    <MotionElement.span
-                      initial={{ scale: 0.7, opacity: 0.3 }}
-                      animate={{ scale: 1, opacity: 1 }}
-                      className="absolute -right-1 -top-1 inline-flex size-4.5 items-center justify-center rounded-full bg-primary text-primary-foreground shadow-sm"
-                    >
-                      <Check className="size-3" />
-                    </MotionElement.span>
-                  ) : null}
-                  <span className="pointer-events-none absolute -bottom-7 left-1/2 z-20 hidden -translate-x-1/2 rounded-md border bg-popover px-2 py-1 text-[10px] font-medium capitalize text-popover-foreground shadow-md group-hover:block">
-                    {option.id}
-                  </span>
-                </MotionElement.button>
-              ))}
+                  >
+                    <span
+                      className={cn(
+                        "size-4 rounded-full",
+                        option.previewClass,
+                        isActive && "ring-2 ring-primary ring-offset-2 ring-offset-background"
+                      )}
+                    />
+                    <span className="text-sm capitalize">{option.id}</span>
+                  </button>
+                )
+              })}
             </div>
-          </section>
+          </SettingSection>
 
-          <section className="space-y-3 rounded-2xl border bg-card/80 p-4 shadow-sm backdrop-blur">
-            <h3 className="text-sm font-semibold tracking-tight">Corner style</h3>
-            <div className="grid grid-cols-3 gap-2">
-              {RADIUS_OPTIONS.map((option) => (
-                <MotionElement.button
-                  key={option.id}
-                  type="button"
-                  onClick={() => onRadiusChange(option.id)}
-                  whileTap={{ scale: 0.98 }}
-                  className={cn(
-                    "rounded-xl border px-3 py-2 text-sm font-medium transition-colors",
-                    radius === option.id
-                      ? "border-primary/40 bg-primary/10 text-foreground"
-                      : "border-border bg-background/70 text-muted-foreground hover:bg-muted/40"
-                  )}
-                >
-                  {option.label}
-                </MotionElement.button>
-              ))}
-            </div>
-          </section>
+          <SettingSection title="Corner style">
+            <SettingSegment
+              options={RADIUS_OPTIONS}
+              value={radius}
+              onChange={(id) => setRadius(id as Radius)}
+            />
+          </SettingSection>
 
-          <section className="space-y-3 rounded-2xl border bg-card/80 p-4 shadow-sm backdrop-blur">
-            <h3 className="flex items-center gap-2 text-sm font-semibold">
-              <Type className="size-4 text-muted-foreground" />
-              Text scale
-            </h3>
-            <div className="grid grid-cols-3 gap-2">
-              {SCALE_OPTIONS.map((option) => (
-                <MotionElement.button
-                  key={option.id}
-                  type="button"
-                  onClick={() => onScaleChange(option.id)}
-                  whileTap={{ scale: 0.98 }}
-                  className={cn(
-                    "rounded-xl border px-3 py-2 text-sm font-medium transition-colors",
-                    scale === option.id
-                      ? "border-primary/40 bg-primary/10 text-foreground"
-                      : "border-border bg-background/70 text-muted-foreground hover:bg-muted/40"
-                  )}
-                >
-                  {option.preview}
-                </MotionElement.button>
-              ))}
-            </div>
-          </section>
+          <SettingSection title="Text scale">
+            <SettingSegment
+              options={SCALE_OPTIONS}
+              value={scale}
+              onChange={(id) => setScale(id as Scale)}
+            />
+          </SettingSection>
 
-          <section className="space-y-3 rounded-2xl border bg-card/80 p-4 shadow-sm backdrop-blur">
-            <h3 className="flex items-center gap-2 text-sm font-semibold">
-              <Zap className="size-4 text-muted-foreground" />
-              Motion
-            </h3>
-            <div className="grid grid-cols-2 gap-2">
-              <MotionElement.button
-                type="button"
-                onClick={() => onMotionChange("default")}
-                whileTap={{ scale: 0.98 }}
-                className={cn(
-                  "rounded-xl border px-3 py-2 text-sm font-medium transition-colors",
-                  motion === "default"
-                    ? "border-primary/40 bg-primary/10 text-foreground"
-                    : "border-border bg-background/70 text-muted-foreground hover:bg-muted/40"
-                )}
-              >
-                Smooth
-              </MotionElement.button>
-              <MotionElement.button
-                type="button"
-                onClick={() => onMotionChange("reduced")}
-                whileTap={{ scale: 0.98 }}
-                className={cn(
-                  "rounded-xl border px-3 py-2 text-sm font-medium transition-colors",
-                  motion === "reduced"
-                    ? "border-primary/40 bg-primary/10 text-foreground"
-                    : "border-border bg-background/70 text-muted-foreground hover:bg-muted/40"
-                )}
-              >
-                Reduced
-              </MotionElement.button>
-            </div>
-          </section>
+          <SettingSection title="Motion">
+            <SettingSegment
+              options={MOTION_OPTIONS}
+              value={motion}
+              onChange={(id) => setMotion(id as Motion)}
+            />
+          </SettingSection>
 
-          <div className="rounded-2xl border bg-card/80 p-4 shadow-sm backdrop-blur">
-            <p className="mb-2 text-xs text-muted-foreground">Live preview</p>
-            <div className="space-y-3 rounded-xl border bg-background p-3">
-              <div className="flex items-center justify-between rounded-lg bg-muted/40 px-2.5 py-2">
-                <p className="text-sm font-medium">Workspace sample</p>
-                <span className="inline-flex items-center gap-1 rounded-full border bg-background px-2 py-1 text-[10px] font-medium text-muted-foreground">
-                  <Palette className="size-3" />
-                  {accent}
-                </span>
-              </div>
+          <SettingSection title="Preview" className="border-b-0">
+            <div className="space-y-3 border-t border-border/40 pt-3">
               <p className="text-xs text-muted-foreground">
-                Accent, radius, text scale, and animation preferences update instantly.
+                Sample controls reflect your current theme settings.
               </p>
-              <div className="flex items-center justify-between gap-2">
-                <Button size="sm" className="rounded-full">
-                  Primary action
-                </Button>
+              <div className="flex items-center gap-2">
+                <Button size="sm">Primary</Button>
                 <Button size="sm" variant="outline">
                   Secondary
                 </Button>
-                <span className="rounded-md bg-muted px-2 py-1 text-[10px] font-medium uppercase text-muted-foreground">
-                  {motion === "default" ? "smooth" : "reduced"}
-                </span>
               </div>
             </div>
-          </div>
+          </SettingSection>
 
           <Button
             type="button"
-            variant="outline"
-            className="h-10 w-full rounded-xl border-dashed bg-background/70"
+            variant="ghost"
+            className="mt-2 h-9 w-full justify-start px-0 text-sm text-muted-foreground hover:text-foreground"
             onClick={resetThemePreferences}
           >
-            <Sparkles className="size-4" />
-            Reset to recommended defaults
+            Reset to defaults
           </Button>
         </div>
       </SheetContent>

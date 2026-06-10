@@ -12,6 +12,7 @@ import { mockPerspectiveTree } from "@/features/drive/data/mock-perspective-tree
 import { PerspectiveDocumentViewer } from "@/features/drive/components/perspective-view/perspective-document-viewer"
 import { PerspectiveInfoPanel } from "@/features/drive/components/perspective-view/perspective-info-panel"
 import { PerspectivePanelHandle } from "@/features/drive/components/perspective-view/perspective-panel-handle"
+import { ManageSharingDialog } from "@/features/drive/components/manage-sharing-dialog"
 import { PerspectiveTreePanel } from "@/features/drive/components/perspective-view/perspective-tree-panel"
 import { getDocumentViewerHeaderActions } from "@/features/drive/lib/document-viewer-header-actions"
 import {
@@ -40,6 +41,7 @@ export function PerspectiveViewPage() {
   const [expandedIds, setExpandedIds] = React.useState<Set<string>>(() =>
     getDefaultExpandedIds(mockPerspectiveTree, initialSelectedId)
   )
+  const [sharingOpen, setSharingOpen] = React.useState(false)
 
   React.useEffect(() => {
     setSelectedId(initialSelectedId)
@@ -62,6 +64,23 @@ export function PerspectiveViewPage() {
   )
   const headerKind = rootNode?.kind ?? "folder"
 
+  const sharingTitle = selectedNode?.label ?? headerTitle
+  const sharingSubtitle = formatPerspectiveSubtitle(
+    selectedNode?.createdAt ?? rootNode?.createdAt ?? "11-02-2026"
+  )
+  const sharingKind = selectedNode?.kind ?? headerKind
+  const sharingShared =
+    selectedNode?.shared ?? selectedNode?.kind === "shared-folder"
+
+  const handleHeaderAction = React.useCallback(
+    (actionId: "comments" | "share" | "download" | "print" | "fullscreen" | "info") => {
+      if (actionId === "share") {
+        setSharingOpen(true)
+      }
+    },
+    []
+  )
+
   return (
     <>
       <DocumentViewerHeader
@@ -72,6 +91,17 @@ export function PerspectiveViewPage() {
         shared={rootNode?.shared}
         actions={getDocumentViewerHeaderActions(headerKind)}
         backHref="/owned-by-me"
+        onAction={handleHeaderAction}
+      />
+
+      <ManageSharingDialog
+        open={sharingOpen}
+        onOpenChange={setSharingOpen}
+        title={sharingTitle}
+        subtitle={sharingSubtitle}
+        kind={sharingKind}
+        name={sharingTitle}
+        shared={sharingShared}
       />
 
       <div className="min-h-0 flex-1 bg-background">
@@ -117,7 +147,10 @@ export function PerspectiveViewPage() {
             maxSize="36%"
             className="min-h-0 min-w-0 overflow-hidden"
           >
-            <PerspectiveInfoPanel selectedNode={selectedNode} />
+            <PerspectiveInfoPanel
+              selectedNode={selectedNode}
+              onManageSharing={() => setSharingOpen(true)}
+            />
           </ResizablePanel>
         </ResizablePanelGroup>
       </div>

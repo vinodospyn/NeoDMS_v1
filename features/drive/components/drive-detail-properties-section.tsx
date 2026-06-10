@@ -1,10 +1,13 @@
 "use client"
 
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import { DocumentActivityTimeline } from "@/features/drive/components/document-activity-timeline"
+import { DocumentStorageOverview } from "@/features/drive/components/document-storage-overview"
 import {
   DrivePropertiesGrid,
   type DrivePropertyItem,
 } from "@/features/drive/components/drive-property-field"
+import type { PerspectiveTreeNode } from "@/features/drive/data/mock-perspective-tree"
 import { cn } from "@/lib/utils"
 
 const secondaryTabTriggerClass = cn(
@@ -17,11 +20,13 @@ const secondaryTabTriggerClass = cn(
 
 type DriveDetailPropertiesSectionProps = {
   items: DrivePropertyItem[]
+  selectedNode?: PerspectiveTreeNode | null
   className?: string
 }
 
 export function DriveDetailPropertiesSection({
   items,
+  selectedNode = null,
   className,
 }: DriveDetailPropertiesSectionProps) {
   return (
@@ -46,14 +51,10 @@ export function DriveDetailPropertiesSection({
           <DrivePropertiesGrid items={items} />
         </TabsContent>
         <TabsContent value="activity" className="mt-3 outline-none">
-          <p className="rounded-lg border border-dashed border-border/60 bg-background px-3 py-5 text-center text-xs text-muted-foreground">
-            Activity timeline coming soon.
-          </p>
+          <DocumentActivityTimeline selectedNode={selectedNode} />
         </TabsContent>
         <TabsContent value="storage" className="mt-3 outline-none">
-          <p className="rounded-lg border border-dashed border-border/60 bg-background px-3 py-5 text-center text-xs text-muted-foreground">
-            Storage details coming soon.
-          </p>
+          <DocumentStorageOverview selectedNode={selectedNode} />
         </TabsContent>
         <TabsContent value="retention" className="mt-3 outline-none">
           <p className="rounded-lg border border-dashed border-border/60 bg-background px-3 py-5 text-center text-xs text-muted-foreground">

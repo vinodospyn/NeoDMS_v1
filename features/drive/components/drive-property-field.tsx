@@ -19,7 +19,7 @@ export function DrivePropertyField({
   return (
     <div className={cn("min-w-0", className)}>
       <p className="text-xs text-muted-foreground">{label}</p>
-      <p className="mt-1 text-sm font-medium text-foreground">{value}</p>
+      <p className="mt-1 text-xs font-medium text-foreground">{value}</p>
     </div>
   )
 }
