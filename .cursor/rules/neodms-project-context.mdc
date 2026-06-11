@@ -46,7 +46,7 @@ docs/
 1. Thin `app/**/page.tsx` — compose `features/drive/components`.
 2. Drive chrome in `components/layout/`, not in `components/ui/`.
 3. New drive UI under `features/drive/`.
-4. Tables: `docs/TABLE_BEHAVIOR_GUIDE.md`. Drive visuals: `docs/DRIVE_UI_GUIDE.md`.
+4. Tables: `docs/TABLE_BEHAVIOR_GUIDE.md`. Drive visuals: `docs/DRIVE_UI_GUIDE.md`. Labeled text fields: `docs/FORM_FIELD_GUIDE.md`.
 5. File icons: `FileTypeIcon` (Lucide) in `features/drive/components/file-type-icon/`.
 
 ## Neo Drive Routes (`(with-sidebar)`)

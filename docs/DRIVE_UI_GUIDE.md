@@ -1,6 +1,6 @@
 # Neo Drive UI Guide
 
-Design reference for the **Ospyn Neo My Drive** shell implemented in `(with-sidebar)`. Use with `docs/TYPOGRAPHY_GUIDE.md` and `docs/TABLE_BEHAVIOR_GUIDE.md`.
+Design reference for the **Ospyn Neo My Drive** shell implemented in `(with-sidebar)`. Use with `docs/TYPOGRAPHY_GUIDE.md`, `docs/TABLE_BEHAVIOR_GUIDE.md`, and `docs/FORM_FIELD_GUIDE.md`.
 
 ## Scope
 
@@ -42,6 +42,7 @@ Drive styling is scoped via `.drive-shell` on `SidebarProvider` (`app/(with-side
 | Card title | `text-sm font-semibold` |
 | Card subtitle | `text-xs` muted grey |
 | Sidebar nav | `text-sm font-medium` |
+| **Labeled text field** | See `docs/FORM_FIELD_GUIDE.md` — `FieldLabel size="form"`, `Field density="form"`, `FormFieldGroup` |
 
 ## Component Map
 

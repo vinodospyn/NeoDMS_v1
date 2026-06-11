@@ -28,6 +28,7 @@ When confirmation is needed, ask:
 
 - Drive-specific layouts (sidebar, dashboard cards, explorer toolbar) belong in `features/drive/` or `components/layout/`, not new `components/ui/*` files.
 - Shared table styling uses `components/ui/table.tsx` (`TableContainer`, `TableSortHead`, etc.) — see `docs/TABLE_BEHAVIOR_GUIDE.md`.
+- Labeled text fields use `FormFieldGroup`, `Field density="form"`, and `FieldLabel size="form"` from `components/ui/field.tsx` — see `docs/FORM_FIELD_GUIDE.md`.
 - Drive colors/spacing: `docs/DRIVE_UI_GUIDE.md` and `.drive-shell` tokens in `app/globals.css`.
 
 ## Styling and Consistency
