@@ -8,7 +8,9 @@ function isFolderNode(node: PerspectiveTreeNode) {
   return node.kind === "folder" || node.kind === "shared-folder"
 }
 
-export function isPerspectiveDocument(node: PerspectiveTreeNode | null) {
+export function isPerspectiveDocument(
+  node: PerspectiveTreeNode | null
+): node is PerspectiveTreeNode {
   return node != null && !isFolderNode(node)
 }
 
