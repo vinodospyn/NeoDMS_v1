@@ -51,7 +51,8 @@ export function FileExplorerPage() {
   )
 
   const activeFolderLabel = React.useMemo(
-    () => findFolderLabel(mockFolderTree, selectedFolderId) ?? "u1210 - Arunkumar",
+    () =>
+      findFolderLabel(mockFolderTree, selectedFolderId) ?? "u1210 - Arunkumar",
     [selectedFolderId]
   )
 
@@ -79,7 +80,7 @@ export function FileExplorerPage() {
   return (
     <div className="flex h-full min-h-0 w-full flex-1 flex-col overflow-hidden">
       <div
-        className="grid h-full min-h-0 w-full overflow-hidden rounded-xl border border-border/70 bg-background shadow-sm"
+        className="grid h-full min-h-0 w-full overflow-hidden"
         style={{
           gridTemplateColumns,
           transition: `grid-template-columns ${EXPLORER_DRAWER_TRANSITION_MS}ms ${EXPLORER_DRAWER_EASE}`,

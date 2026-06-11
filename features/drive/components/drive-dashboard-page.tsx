@@ -15,7 +15,7 @@ export function DriveDashboardPage() {
   const greeting = getGreeting()
 
   return (
-    <div className="mx-auto w-full max-w-[1400px] flex-1 px-6 pb-8 md:px-8">
+    <div className="mx-auto w-full flex-1 px-6 pb-8">
       <header className="mb-8 pt-2">
         <h1 className="text-2xl font-semibold tracking-tight text-foreground">
           {greeting}, {appConfig.userDisplayName}
