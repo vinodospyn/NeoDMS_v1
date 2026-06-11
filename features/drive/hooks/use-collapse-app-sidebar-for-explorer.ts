@@ -14,12 +14,11 @@ export function useCollapseAppSidebarForFoldersDrawer(
   const { open, setOpen, isMobile, openMobile, setOpenMobile } = useSidebar()
   const prevDrawerOpen = React.useRef(false)
   const sidebarSnapshot = React.useRef<boolean | null>(null)
+  const sidebarApiRef = React.useRef({ isMobile, setOpen, setOpenMobile })
 
-  const sidebarStateRef = React.useRef({ open, openMobile, isMobile })
-  sidebarStateRef.current = { open, openMobile, isMobile }
-
-  const setSidebarRef = React.useRef({ setOpen, setOpenMobile })
-  setSidebarRef.current = { setOpen, setOpenMobile }
+  React.useEffect(() => {
+    sidebarApiRef.current = { isMobile, setOpen, setOpenMobile }
+  })
 
   React.useEffect(() => {
     const justOpened = myFoldersDrawerOpen && !prevDrawerOpen.current
@@ -27,33 +26,37 @@ export function useCollapseAppSidebarForFoldersDrawer(
     prevDrawerOpen.current = myFoldersDrawerOpen
 
     if (justOpened) {
-      const { open: desktopOpen, openMobile: mobileOpen, isMobile: mobile } =
-        sidebarStateRef.current
-      const wasOpen = mobile ? mobileOpen : desktopOpen
+      const wasOpen = isMobile ? openMobile : open
       sidebarSnapshot.current = wasOpen
       if (wasOpen) {
-        if (mobile) setSidebarRef.current.setOpenMobile(false)
-        else setSidebarRef.current.setOpen(false)
+        if (isMobile) setOpenMobile(false)
+        else setOpen(false)
       }
       return
     }
 
     if (justClosed && sidebarSnapshot.current !== null) {
       const restore = sidebarSnapshot.current
-      const { isMobile: mobile } = sidebarStateRef.current
-      if (mobile) setSidebarRef.current.setOpenMobile(restore)
-      else setSidebarRef.current.setOpen(restore)
+      if (isMobile) setOpenMobile(restore)
+      else setOpen(restore)
       sidebarSnapshot.current = null
     }
-  }, [myFoldersDrawerOpen])
+  }, [
+    myFoldersDrawerOpen,
+    open,
+    openMobile,
+    isMobile,
+    setOpen,
+    setOpenMobile,
+  ])
 
   React.useEffect(() => {
     return () => {
       const previous = sidebarSnapshot.current
       if (previous === null) return
-      const { isMobile: mobile } = sidebarStateRef.current
-      if (mobile) setSidebarRef.current.setOpenMobile(previous)
-      else setSidebarRef.current.setOpen(previous)
+      const { isMobile: mobile, setOpen, setOpenMobile } = sidebarApiRef.current
+      if (mobile) setOpenMobile(previous)
+      else setOpen(previous)
       sidebarSnapshot.current = null
     }
   }, [])

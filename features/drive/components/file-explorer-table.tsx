@@ -2,7 +2,13 @@
 
 import * as React from "react"
 import { useRouter } from "next/navigation"
-import { Download, ExternalLink, MoreVertical, Share2, Star } from "lucide-react"
+import {
+  Download,
+  ExternalLink,
+  MoreVertical,
+  Share2,
+  Star,
+} from "lucide-react"
 
 import { Button } from "@/components/ui/button"
 import { Checkbox } from "@/components/ui/checkbox"
@@ -30,7 +36,11 @@ import {
 import { cn } from "@/lib/utils"
 import { mockDriveItems } from "@/features/drive/data/mock-files"
 import { FileTypeIcon } from "@/features/drive/components/file-type-icon/file-type-icon"
-import type { DriveItem, DriveSortDirection, DriveSortKey } from "@/features/drive/types"
+import type {
+  DriveItem,
+  DriveSortDirection,
+  DriveSortKey,
+} from "@/features/drive/types"
 
 const ROWS_PER_PAGE = 10
 
@@ -108,8 +118,7 @@ export function FileExplorerTable({
 
   const totalPages = Math.max(1, Math.ceil(sorted.length / ROWS_PER_PAGE))
   const safePage = Math.min(page, totalPages)
-  const pageStart =
-    sorted.length === 0 ? 0 : (safePage - 1) * ROWS_PER_PAGE + 1
+  const pageStart = sorted.length === 0 ? 0 : (safePage - 1) * ROWS_PER_PAGE + 1
   const pageEnd = Math.min(safePage * ROWS_PER_PAGE, sorted.length)
   const paginated = React.useMemo(() => {
     const start = (safePage - 1) * ROWS_PER_PAGE
@@ -148,134 +157,138 @@ export function FileExplorerTable({
   const table = (
     <>
       <div className="min-h-0 w-full max-w-full flex-1 overflow-auto">
-      <Table className="min-w-[960px] w-full">
-        <TableHeader>
-          <TableRow className="hover:bg-transparent">
-            <TableHead className="w-12">
-              <Checkbox
-                checked={allOnPageSelected}
-                onCheckedChange={(value) => handleSelectAll(value === true)}
-                aria-label="Select all on page"
-              />
-            </TableHead>
-            <TableSortHead
-              className="min-w-[200px]"
-              sortDirection={sortKey === "name" ? sortDirection : false}
-              onSort={() => handleSort("name")}
-            >
-              Name
-            </TableSortHead>
-            <TableHead className="w-[17%]">Category</TableHead>
-            <TableHead className="w-[12%]">Workspace</TableHead>
-            <TableSortHead
-              className="w-[20%]"
-              sortDirection={sortKey === "createdAt" ? sortDirection : false}
-              onSort={() => handleSort("createdAt")}
-            >
-              Created Date
-            </TableSortHead>
-            <TableHead className="w-[10%]">File Size</TableHead>
-            <TableHead className="w-[188px] text-right">Actions</TableHead>
-          </TableRow>
-        </TableHeader>
-        <TableBody>
-          {paginated.map((item) => {
-            const isSelected = selectedId === item.id
-            const isChecked = selectedIds.has(item.id)
-            return (
-              <TableRow
-                key={item.id}
-                data-state={isSelected ? "selected" : undefined}
-                className="h-11 cursor-pointer"
-                onClick={() => setSelectedId(item.id)}
-              >
-                <TableCell
-                  className="py-2"
-                  onClick={(event) => event.stopPropagation()}
-                >
+        <Table className="w-full min-w-[960px]">
+          <TableHeader>
+            <TableRow className="hover:bg-transparent">
+              <TableHead className="pl-6">
+                <div className="flex items-center">
                   <Checkbox
-                    checked={isChecked}
-                    onCheckedChange={(value) => {
-                      setSelectedIds((prev) => {
-                        const next = new Set(prev)
-                        if (value === true) next.add(item.id)
-                        else next.delete(item.id)
-                        return next
-                      })
-                    }}
-                    aria-label={`Select ${item.name}`}
+                    checked={allOnPageSelected}
+                    onCheckedChange={(value) => handleSelectAll(value === true)}
+                    aria-label="Select all on page"
                   />
-                </TableCell>
-                <TableCell className="py-2">
-                  <div className="flex items-center gap-2.5">
-                    <FileTypeIcon
-                      name={item.name}
-                      explicitType={item.type}
-                      variant="compact"
-                      size="md"
-                    />
-                    <span className="font-medium text-foreground">{item.name}</span>
-                  </div>
-                </TableCell>
-                <TableCell className="py-2 text-muted-foreground">
-                  {item.category}
-                </TableCell>
-                <TableCell className="py-2 text-muted-foreground">
-                  {item.workspace}
-                </TableCell>
-                <TableCell className="py-2 text-muted-foreground">
-                  {item.createdAt}
-                </TableCell>
-                <TableCell className="py-2 text-muted-foreground">
-                  {item.fileSize ?? "--"}
-                </TableCell>
-                <TableCell
-                  className="py-2 text-right"
-                  onClick={(event) => event.stopPropagation()}
+                </div>
+              </TableHead>
+              <TableSortHead
+                className="min-w-[200px]"
+                sortDirection={sortKey === "name" ? sortDirection : false}
+                onSort={() => handleSort("name")}
+              >
+                Name
+              </TableSortHead>
+              <TableHead className="w-[17%]">Category</TableHead>
+
+              <TableSortHead
+                className="w-[20%]"
+                sortDirection={sortKey === "createdAt" ? sortDirection : false}
+                onSort={() => handleSort("createdAt")}
+              >
+                Created Date
+              </TableSortHead>
+              <TableHead className="w-[10%]">File Size</TableHead>
+              <TableHead className="w-[188px] text-right">Actions</TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {paginated.map((item) => {
+              const isSelected = selectedId === item.id
+              const isChecked = selectedIds.has(item.id)
+              return (
+                <TableRow
+                  key={item.id}
+                  data-state={isSelected ? "selected" : undefined}
+                  className="h-11 cursor-pointer"
+                  onClick={() => setSelectedId(item.id)}
                 >
-                  <TableRowActions>
-                    <TableRowAction
-                      type="button"
-                      aria-label={item.starred ? "Unstar" : "Star"}
-                    >
-                      <Star
-                        className={cn(
-                          "size-4",
-                          item.starred
-                            ? "fill-amber-400 text-amber-400"
-                            : "opacity-70"
-                        )}
+                  <TableCell
+                    className="pl-6"
+                    onClick={(event) => event.stopPropagation()}
+                  >
+                    <div className="flex items-center">
+                      <Checkbox
+                        checked={isChecked}
+                        onCheckedChange={(value) => {
+                          setSelectedIds((prev) => {
+                            const next = new Set(prev)
+                            if (value === true) next.add(item.id)
+                            else next.delete(item.id)
+                            return next
+                          })
+                        }}
+                        aria-label={`Select ${item.name}`}
                       />
-                    </TableRowAction>
-                    <TableRowAction type="button" aria-label="Share">
-                      <Share2 className="size-4" />
-                    </TableRowAction>
-                    <TableRowAction type="button" aria-label="Download">
-                      <Download className="size-4" />
-                    </TableRowAction>
-                    <TableRowAction
-                      type="button"
-                      aria-label="Open in perspective view"
-                      onClick={() =>
-                        router.push(`/perspective-view?id=${item.id}`)
-                      }
-                    >
-                      <ExternalLink className="size-4" />
-                    </TableRowAction>
-                    <TableRowAction
-                      type="button"
-                      visibility="always"
-                      aria-label="More actions"
-                    >
-                      <MoreVertical className="size-4" />
-                    </TableRowAction>
-                  </TableRowActions>
-                </TableCell>
-              </TableRow>
-            )
-          })}
-        </TableBody>
-      </Table>
+                    </div>
+                  </TableCell>
+                  <TableCell className="py-2">
+                    <div className="flex items-center gap-2.5">
+                      <FileTypeIcon
+                        name={item.name}
+                        explicitType={item.type}
+                        variant="compact"
+                        size="md"
+                      />
+                      <span className="font-medium text-foreground">
+                        {item.name}
+                      </span>
+                    </div>
+                  </TableCell>
+                  <TableCell className="py-2 text-muted-foreground">
+                    {item.category}
+                  </TableCell>
+
+                  <TableCell className="py-2 text-muted-foreground">
+                    {item.createdAt}
+                  </TableCell>
+                  <TableCell className="py-2 text-muted-foreground">
+                    {item.fileSize ?? "--"}
+                  </TableCell>
+                  <TableCell
+                    className="py-2 text-right"
+                    onClick={(event) => event.stopPropagation()}
+                  >
+                    <TableRowActions>
+                      <TableRowAction
+                        type="button"
+                        aria-label={item.starred ? "Unstar" : "Star"}
+                      >
+                        <Star
+                          className={cn(
+                            "size-4",
+                            item.starred
+                              ? "fill-amber-400 text-amber-400"
+                              : "opacity-70"
+                          )}
+                        />
+                      </TableRowAction>
+                      <TableRowAction type="button" aria-label="Share">
+                        <Share2 className="size-4" />
+                      </TableRowAction>
+                      <TableRowAction type="button" aria-label="Download">
+                        <Download className="size-4" />
+                      </TableRowAction>
+                      <TableRowAction
+                        type="button"
+                        aria-label="Open in perspective view"
+                        onClick={() =>
+                          router.push(`/perspective-view?id=${item.id}`)
+                        }
+                      >
+                        <ExternalLink className="size-4" />
+                      </TableRowAction>
+                      <TableRowAction
+                        type="button"
+                        visibility="always"
+                        aria-label="More actions"
+                      >
+                        <MoreVertical className="size-4" />
+                      </TableRowAction>
+                    </TableRowActions>
+                  </TableCell>
+                </TableRow>
+              )
+            })}
+          </TableBody>
+        </Table>
       </div>
       <TableFooterBar className="mt-auto shrink-0 border-t border-border/60 bg-background px-4 py-2.5">
         <p className="text-sm text-muted-foreground">
@@ -292,7 +305,9 @@ export function FileExplorerTable({
                     setPage((current) => Math.max(current - 1, 1))
                   }}
                   aria-disabled={safePage === 1}
-                  className={safePage === 1 ? "pointer-events-none opacity-50" : ""}
+                  className={
+                    safePage === 1 ? "pointer-events-none opacity-50" : ""
+                  }
                 />
               </PaginationItem>
               <PaginationItem>
@@ -309,7 +324,9 @@ export function FileExplorerTable({
                   }}
                   aria-disabled={safePage === totalPages}
                   className={
-                    safePage === totalPages ? "pointer-events-none opacity-50" : ""
+                    safePage === totalPages
+                      ? "pointer-events-none opacity-50"
+                      : ""
                   }
                 />
               </PaginationItem>
@@ -345,7 +362,7 @@ export function FileExplorerTable({
 
   if (embedded) {
     return (
-      <div className="flex min-h-0 w-full max-w-full flex-1 flex-col overflow-hidden">
+      <div className="flex min-h-0 w-full max-w-full flex-1 flex-col overflow-hidden bg-background">
         {table}
       </div>
     )
