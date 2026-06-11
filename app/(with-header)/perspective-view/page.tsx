@@ -11,7 +11,27 @@ function formatCreatedSubtitle(createdAt: string) {
   return `Created on : ${createdAt}`
 }
 
-export default function PerspectiveViewPage() {
+function PerspectiveViewFallback() {
+  return (
+    <>
+      <DocumentViewerHeader
+        title="Certificates"
+        subtitle="Created on : 11-02-2026"
+        kind="folder"
+        name="Certificates"
+        shared={false}
+        actions={getDocumentViewerHeaderActions("folder")}
+        backHref="/owned-by-me"
+      />
+
+      <div className="flex min-h-0 flex-1 items-center justify-center p-6 text-sm text-muted-foreground">
+        Perspective view — main layout will be added next.
+      </div>
+    </>
+  )
+}
+
+function PerspectiveViewContent() {
   const searchParams = useSearchParams()
   const itemId = searchParams.get("id")
   const driveItem = React.useMemo(
@@ -42,5 +62,13 @@ export default function PerspectiveViewPage() {
         Perspective view — main layout will be added next.
       </div>
     </>
+  )
+}
+
+export default function PerspectiveViewPage() {
+  return (
+    <React.Suspense fallback={<PerspectiveViewFallback />}>
+      <PerspectiveViewContent />
+    </React.Suspense>
   )
 }
