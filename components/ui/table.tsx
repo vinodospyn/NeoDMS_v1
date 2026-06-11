@@ -6,10 +6,7 @@ import { ArrowDown, ArrowUp, ArrowUpDown } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { cn } from "@/lib/utils"
 
-function TableContainer({
-  className,
-  ...props
-}: React.ComponentProps<"div">) {
+function TableContainer({ className, ...props }: React.ComponentProps<"div">) {
   return (
     <div
       data-slot="table-shell"
@@ -95,8 +92,8 @@ function TableHead({ className, ...props }: React.ComponentProps<"th">) {
     <th
       data-slot="table-head"
       className={cn(
-        "h-11 px-4 text-left align-middle text-sm font-medium whitespace-nowrap text-muted-foreground",
-        "[&:has([role=checkbox])]:w-12 [&:has([role=checkbox])]:px-3 [&:has([role=checkbox])]:pr-0",
+        "h-11 bg-secondary px-4 text-left align-middle text-sm font-medium whitespace-nowrap text-muted-foreground",
+        "[&:has([role=checkbox])]:w-12 [&:has([role=checkbox])]:px-3 [&:has([role=checkbox])]:pr-0 [&:has([role=checkbox])]:py-0",
         className
       )}
       {...props}
@@ -138,7 +135,7 @@ function TableSortHead({
       <button
         type="button"
         onClick={onSort}
-        className="inline-flex items-center gap-1.5 rounded-sm font-medium text-muted-foreground transition-colors hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/50"
+        className="inline-flex items-center gap-1.5 rounded-sm font-medium text-muted-foreground transition-colors hover:text-foreground focus-visible:ring-2 focus-visible:ring-ring/50 focus-visible:outline-none"
       >
         {children}
         <SortIcon
@@ -158,8 +155,8 @@ function TableCell({ className, ...props }: React.ComponentProps<"td">) {
     <td
       data-slot="table-cell"
       className={cn(
-        "px-4 py-3 align-middle whitespace-nowrap text-sm text-foreground",
-        "[&:has([role=checkbox])]:w-12 [&:has([role=checkbox])]:px-3 [&:has([role=checkbox])]:pr-0",
+        "px-4 py-3 align-middle text-sm whitespace-nowrap text-foreground",
+        "[&:has([role=checkbox])]:w-12 [&:has([role=checkbox])]:px-3 [&:has([role=checkbox])]:pr-0 [&:has([role=checkbox])]:py-0",
         className
       )}
       {...props}
@@ -180,10 +177,7 @@ function TableCaption({
   )
 }
 
-function TableFooterBar({
-  className,
-  ...props
-}: React.ComponentProps<"div">) {
+function TableFooterBar({ className, ...props }: React.ComponentProps<"div">) {
   return (
     <div
       data-slot="table-footer-bar"

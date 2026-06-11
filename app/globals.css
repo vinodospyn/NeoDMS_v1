@@ -157,7 +157,7 @@
     --primary-button-from-hover: #049053;
     --primary-button-to-hover: #0b5a39;
     --primary-button-ring: rgb(52 211 153 / 45%);
-    --drive-folder-fill: #646c7f;
+    --drive-folder-fill: #49597E;
 }
 
 .semi-dark {
@@ -503,8 +503,9 @@
   --drive-surface: #f9fafb;
   --drive-quick-access: #EFF3F7;  
     --light-gradient-bg: linear-gradient(to top right,
-        color-mix(in oklch, var(--primary) 15%, transparent),
-        color-mix(in oklch, var(--blue-light) 15%, transparent));
+        color-mix(in oklch, var(--primary) 10%, transparent),
+        color-mix(in oklch, var(--blue-light) 10%, transparent));
+       
 }
 
 /* Light theme — light sidebar shell; primary/accent follow selected palette */
