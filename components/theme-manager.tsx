@@ -377,26 +377,12 @@ export function ThemeManager({ trigger }: { trigger: React.ReactNode }) {
             />
           </SettingSection>
 
-          <SettingSection title="Motion">
+          <SettingSection title="Motion" className="border-b-0">
             <SettingSegment
               options={MOTION_OPTIONS}
               value={motion}
               onChange={(id) => setMotion(id as Motion)}
             />
-          </SettingSection>
-
-          <SettingSection title="Preview" className="border-b-0">
-            <div className="space-y-3 border-t border-border/40 pt-3">
-              <p className="text-xs text-muted-foreground">
-                Sample controls reflect your current theme settings.
-              </p>
-              <div className="flex items-center gap-2">
-                <Button size="sm">Primary</Button>
-                <Button size="sm" variant="outline">
-                  Secondary
-                </Button>
-              </div>
-            </div>
           </SettingSection>
 
           <Button

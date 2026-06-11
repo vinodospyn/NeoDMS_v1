@@ -124,7 +124,7 @@ export function PerspectiveInfoPanel({
 
       <Tabs defaultValue="info" className="flex min-h-0 flex-1 flex-col gap-0">
 
-        <div className="shrink-0 p-3 pb-0">
+        <div className="shrink-0 p-4 pb-0">
 
           <section className="overflow-hidden rounded-xl border border-border/60 bg-background">
 
@@ -226,7 +226,7 @@ export function PerspectiveInfoPanel({
 
           value="info"
 
-          className="mt-3 min-h-0 flex-1 overflow-auto px-3 pb-3 outline-none"
+          className="mt-3 min-h-0 flex-1 overflow-auto px-4 pb-4 outline-none"
 
         >
 
@@ -249,7 +249,7 @@ export function PerspectiveInfoPanel({
 
           value="header-properties"
 
-          className="mt-3 min-h-0 flex-1 overflow-auto px-3 pb-3 outline-none"
+          className="mt-3 min-h-0 flex-1 overflow-auto px-4 pb-4 outline-none"
 
         >
 
@@ -263,7 +263,7 @@ export function PerspectiveInfoPanel({
 
           value="comments"
 
-          className="mt-3 flex min-h-0 flex-1 flex-col px-3 pb-3 pt-1 outline-none"
+          className="mt-3 flex min-h-0 flex-1 flex-col px-4 pb-4 pt-1 outline-none"
 
         >
 

@@ -74,7 +74,7 @@ export function ShareRecipientRow({
       >
         <SelectTrigger
           size="sm"
-          className="h-8 w-[4.75rem] shrink-0 rounded-lg border-border/70 bg-muted/30 px-2 text-xs font-medium shadow-none"
+          className="h-8 w-[5.25rem] shrink-0 rounded-lg border-border/70 bg-muted/30 px-2 text-xs font-medium shadow-none"
         >
           <SelectValue />
         </SelectTrigger>

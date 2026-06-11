@@ -83,6 +83,6 @@ export const mockShareGroups: ShareGroup[] = [
 ]
 
 export const sharePermissionLabels: Record<SharePermission, string> = {
-  "view-only": "View",
-  edit: "Edit",
+  "view-only": "Viewer",
+  edit: "Editor",
 }
