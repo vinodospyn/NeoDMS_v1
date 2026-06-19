@@ -90,7 +90,7 @@ export function PerspectiveViewPage() {
         name={headerTitle}
         shared={rootNode?.shared}
         actions={getDocumentViewerHeaderActions(headerKind)}
-        backHref="/owned-by-me"
+        backHref="/personal-space"
         onAction={handleHeaderAction}
       />
 

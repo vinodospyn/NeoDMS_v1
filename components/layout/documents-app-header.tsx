@@ -7,7 +7,10 @@ import { Bell, ChevronDown, Palette, Search, Sparkles, X } from "lucide-react"
 import { ThemeManager } from "@/components/theme-manager"
 import { appConfig } from "@/config/app"
 import { getSidebarNavItems } from "@/config/nav/resolver"
-import { sidebarSettingsNavItem } from "@/config/nav/sidebar-nav"
+import {
+  flattenSidebarNavItems,
+  sidebarSettingsNavItem,
+} from "@/config/nav/sidebar-nav"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -15,11 +18,13 @@ import { SidebarTrigger } from "@/components/ui/sidebar"
 import { isNavItemActive } from "@/lib/navigation"
 
 const ROUTE_TITLES: Record<string, string> = {
-  "/": "Dashboard",
-  "/owned-by-me": "Owned by me",
+  "/": "Home",
+  "/personal-space": "Personal Space",
+  "/workspaces/finance": "Finance",
+  "/workspaces/human-resource": "Human Resource",
+  "/workspaces/marketing": "Marketing",
   "/shared-with-me": "Shared with me",
-  "/shared-by-me": "Shared by me",
-  "/quick-access": "Quick access",
+  "/favorite": "Favorite",
   "/recent": "Recent",
   "/trash": "Trash",
   "/settings": "Settings",
@@ -27,9 +32,12 @@ const ROUTE_TITLES: Record<string, string> = {
 
 function getPageTitle(pathname: string): string {
   if (ROUTE_TITLES[pathname]) return ROUTE_TITLES[pathname]
-  const navItems = [...getSidebarNavItems(), sidebarSettingsNavItem]
+  const navItems = [
+    ...flattenSidebarNavItems(getSidebarNavItems()),
+    sidebarSettingsNavItem,
+  ]
   const active = navItems.find((item) => isNavItemActive(pathname, item.href))
-  return active?.label ?? "Dashboard"
+  return active?.label ?? "Home"
 }
 
 function DriveSearchBar({ className }: { className?: string }) {

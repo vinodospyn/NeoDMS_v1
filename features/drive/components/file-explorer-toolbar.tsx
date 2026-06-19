@@ -6,7 +6,6 @@ import {
   Grid3x3,
   Info,
   List,
-  Plus,
   Search,
   SlidersHorizontal,
 } from "lucide-react"
@@ -15,7 +14,13 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { cn } from "@/lib/utils"
 import { FolderTreeToggleIcon } from "@/features/drive/components/folder-tree-toggle-icon"
-import { explorerFolderToggleClass } from "@/features/drive/lib/explorer-layout"
+import {
+  explorerFolderToggleClass,
+  explorerSearchFieldClass,
+  explorerSearchLeadingIconClass,
+  explorerSearchShellClass,
+  explorerSearchSubmitClass,
+} from "@/features/drive/lib/explorer-layout"
 
 type ExplorerViewMode = "list" | "grid"
 
@@ -43,8 +48,8 @@ export function FileExplorerToolbar({
   const [viewMode, setViewMode] = React.useState<ExplorerViewMode>("list")
 
   return (
-    <div className="flex shrink-0 items-center justify-between gap-2 border-b border-border/60 bg-background px-3 py-2.5">
-      <div className="flex items-center gap-2">
+    <div className="flex shrink-0 items-center justify-between gap-3 border-b border-border/60 bg-background px-3 py-2.5">
+      <div className="flex min-w-0 flex-1 items-center gap-2.5">
         <Button
           type="button"
           variant="ghost"
@@ -61,7 +66,7 @@ export function FileExplorerToolbar({
           <FolderTreeToggleIcon />
         </Button>
 
-        <div className="relative w-full flex-1">
+        <div className="relative w-[400px]">
           <Search
             className="pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2 text-muted-foreground"
             aria-hidden
@@ -77,14 +82,14 @@ export function FileExplorerToolbar({
             type="button"
             variant="ghost"
             size="icon-sm"
-            className="absolute top-1/2 right-1 size-7 -translate-y-1/2 rounded-md bg-(--drive-search-bg) text-primary hover:bg-[#dce8f5]"
+            className="drive-explorer-folder-toggle absolute top-1/2 right-1 size-7 shrink-0 -translate-y-1/2 rounded-[10px] border text-primary shadow-none transition-[filter] hover:brightness-[0.98]"
             aria-label="Search folder"
           >
             <Search className="size-3.5" strokeWidth={2.25} aria-hidden />
           </Button>
         </div>
       </div>
-      <div className="flex items-center gap-2">
+      <div className="flex shrink-0 items-center gap-2">
         <div
           className="flex shrink-0 items-center rounded-lg border border-border/60 bg-muted/25 p-0.5"
           role="group"
@@ -124,15 +129,6 @@ export function FileExplorerToolbar({
           </Button>
         </div>
 
-        <Button
-          type="button"
-          size="sm"
-          className="primary-button h-9 shrink-0 gap-1.5 px-4"
-        >
-          <Plus className="size-4" />
-          New
-        </Button>
-
         <div className="flex shrink-0 items-center">
           <ToolbarDivider />
           <Button
@@ -166,9 +162,7 @@ export function FileExplorerToolbar({
                 : "text-muted-foreground hover:text-foreground"
             )}
             aria-label={
-              certificationOpen
-                ? "Close certificates panel"
-                : "Open certificates panel"
+              certificationOpen ? "Close quick view" : "Open quick view"
             }
             aria-pressed={certificationOpen}
             aria-expanded={certificationOpen}

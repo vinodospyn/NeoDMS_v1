@@ -29,7 +29,7 @@ export function CertificationDrawer({
         <motion.div
           key="certification-drawer-content"
           role="complementary"
-          aria-label="Certificates details"
+          aria-label="Quick view"
           initial={reduceMotion ? false : { opacity: 0, x: 8 }}
           animate={{ opacity: 1, x: 0 }}
           exit={reduceMotion ? undefined : { opacity: 0, x: 8 }}
