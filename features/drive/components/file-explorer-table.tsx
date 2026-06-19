@@ -5,7 +5,6 @@ import { useRouter } from "next/navigation"
 import {
   Download,
   ExternalLink,
-  MoreVertical,
   Share2,
   Star,
 } from "lucide-react"
@@ -35,7 +34,10 @@ import {
 } from "@/components/ui/table"
 import { cn } from "@/lib/utils"
 import { mockDriveItems } from "@/features/drive/data/mock-files"
+import { DriveItemActionsMenu } from "@/features/drive/components/drive-item-actions-menu"
 import { FileTypeIcon } from "@/features/drive/components/file-type-icon/file-type-icon"
+import type { DriveItemActionHandlers } from "@/features/drive/lib/drive-item-actions"
+import { isFolderKind } from "@/features/drive/lib/perspective-tree"
 import type {
   DriveItem,
   DriveSortDirection,
@@ -77,6 +79,8 @@ type FileExplorerTableProps = {
   folderSearch?: string
   selectedId?: string
   onSelectedIdChange?: (id: string) => void
+  onItemFileInfo?: (item: DriveItem) => void
+  actionHandlers?: DriveItemActionHandlers
 }
 
 export function FileExplorerTable({
@@ -84,6 +88,8 @@ export function FileExplorerTable({
   folderSearch = "",
   selectedId: selectedIdProp,
   onSelectedIdChange,
+  onItemFileInfo,
+  actionHandlers,
 }: FileExplorerTableProps) {
   const router = useRouter()
   const [items] = React.useState(mockDriveItems)
@@ -153,6 +159,26 @@ export function FileExplorerTable({
     setPage(Math.min(Math.max(parsed, 1), totalPages))
     setGoToPage("")
   }
+
+  const getItemActionHandlers = React.useCallback(
+    (item: DriveItem): DriveItemActionHandlers => ({
+      open: () => {
+        setSelectedId(item.id)
+      },
+      preview: (target) => {
+        router.push(`/perspective-view?id=${target.id}`)
+      },
+      "open-perspective": (target) => {
+        router.push(`/perspective-view?id=${target.id}`)
+      },
+      "file-info": (target) => {
+        setSelectedId(target.id)
+        onItemFileInfo?.(target)
+      },
+      ...actionHandlers,
+    }),
+    [actionHandlers, onItemFileInfo, router, setSelectedId]
+  )
 
   const table = (
     <>
@@ -263,25 +289,26 @@ export function FileExplorerTable({
                       <TableRowAction type="button" aria-label="Share">
                         <Share2 className="size-4" />
                       </TableRowAction>
-                      <TableRowAction type="button" aria-label="Download">
-                        <Download className="size-4" />
-                      </TableRowAction>
-                      <TableRowAction
-                        type="button"
-                        aria-label="Open in perspective view"
-                        onClick={() =>
-                          router.push(`/perspective-view?id=${item.id}`)
-                        }
-                      >
-                        <ExternalLink className="size-4" />
-                      </TableRowAction>
-                      <TableRowAction
-                        type="button"
-                        visibility="always"
-                        aria-label="More actions"
-                      >
-                        <MoreVertical className="size-4" />
-                      </TableRowAction>
+                      {!isFolderKind(item.type) ? (
+                        <TableRowAction type="button" aria-label="Download">
+                          <Download className="size-4" />
+                        </TableRowAction>
+                      ) : null}
+                      {!isFolderKind(item.type) ? (
+                        <TableRowAction
+                          type="button"
+                          aria-label="Open in perspective view"
+                          onClick={() =>
+                            router.push(`/perspective-view?id=${item.id}`)
+                          }
+                        >
+                          <ExternalLink className="size-4" />
+                        </TableRowAction>
+                      ) : null}
+                      <DriveItemActionsMenu
+                        item={item}
+                        handlers={getItemActionHandlers(item)}
+                      />
                     </TableRowActions>
                   </TableCell>
                 </TableRow>

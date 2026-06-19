@@ -1,18 +1,10 @@
 "use client"
 
 import * as React from "react"
-import { ChevronDown, Home } from "lucide-react"
 
-import {
-  Breadcrumb,
-  BreadcrumbItem,
-  BreadcrumbLink,
-  BreadcrumbList,
-  BreadcrumbPage,
-  BreadcrumbSeparator,
-} from "@/components/ui/breadcrumb"
 import { cn } from "@/lib/utils"
 import { CertificationDrawer } from "@/features/drive/components/certification-drawer"
+import { FileExplorerBreadcrumb } from "@/features/drive/components/file-explorer-breadcrumb"
 import { FileExplorerTable } from "@/features/drive/components/file-explorer-table"
 import { FileExplorerToolbar } from "@/features/drive/components/file-explorer-toolbar"
 import { MyFoldersDrawer } from "@/features/drive/components/my-folders-drawer"
@@ -28,12 +20,6 @@ import {
   findFolderLabel,
   getExplorerGridTemplateColumns,
 } from "@/features/drive/lib/explorer-layout"
-
-const STATIC_CRUMBS = [
-  { label: "My Files", href: "#" },
-  { label: "On-boarding", href: "#" },
-  { label: "Employees", href: "#" },
-] as const
 
 export function FileExplorerPage() {
   const [folderSearch, setFolderSearch] = React.useState("")
@@ -72,6 +58,10 @@ export function FileExplorerPage() {
     setCertificationDrawerOpen(false)
   }, [])
 
+  const openCertificationDrawer = React.useCallback(() => {
+    setCertificationDrawerOpen(true)
+  }, [])
+
   const gridTemplateColumns = getExplorerGridTemplateColumns(
     myFoldersDrawerOpen,
     certificationDrawerOpen
@@ -103,36 +93,10 @@ export function FileExplorerPage() {
 
         <div className="flex min-h-0 min-w-0 flex-col overflow-hidden">
           <div className={explorerChromeBarClass}>
-            <Breadcrumb className="min-w-0 flex-1 overflow-hidden">
-              <BreadcrumbList className="flex-nowrap gap-1 overflow-hidden text-sm">
-                <BreadcrumbItem className="shrink-0">
-                  <BreadcrumbLink
-                    href="#"
-                    className="inline-flex items-center text-muted-foreground hover:text-foreground"
-                  >
-                    <Home className="size-3.5" aria-hidden />
-                    <span className="sr-only">Home</span>
-                  </BreadcrumbLink>
-                </BreadcrumbItem>
-                <BreadcrumbSeparator className="shrink-0" />
-                {STATIC_CRUMBS.map((crumb) => (
-                  <React.Fragment key={crumb.label}>
-                    <BreadcrumbItem className="hidden shrink-0 sm:block">
-                      <BreadcrumbLink href={crumb.href}>
-                        {crumb.label}
-                      </BreadcrumbLink>
-                    </BreadcrumbItem>
-                    <BreadcrumbSeparator className="hidden shrink-0 sm:block" />
-                  </React.Fragment>
-                ))}
-                <BreadcrumbItem className="min-w-0">
-                  <BreadcrumbPage className="inline-flex max-w-full items-center gap-1 truncate font-medium">
-                    <span className="truncate">{activeFolderLabel}</span>
-                    <ChevronDown className="size-3.5 shrink-0 text-muted-foreground" />
-                  </BreadcrumbPage>
-                </BreadcrumbItem>
-              </BreadcrumbList>
-            </Breadcrumb>
+            <FileExplorerBreadcrumb
+              activeFolderLabel={activeFolderLabel}
+              onFileInfo={openCertificationDrawer}
+            />
           </div>
 
           <div className="flex min-h-0 min-w-0 flex-1 flex-col overflow-hidden">
@@ -149,6 +113,7 @@ export function FileExplorerPage() {
               embedded
               selectedId={selectedItemId}
               onSelectedIdChange={setSelectedItemId}
+              onItemFileInfo={openCertificationDrawer}
             />
           </div>
         </div>
