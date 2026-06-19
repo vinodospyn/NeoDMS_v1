@@ -37,16 +37,24 @@ export function PerspectiveViewPage() {
     [itemId]
   )
 
+  return (
+    <PerspectiveViewPageContent
+      key={initialSelectedId}
+      initialSelectedId={initialSelectedId}
+    />
+  )
+}
+
+function PerspectiveViewPageContent({
+  initialSelectedId,
+}: {
+  initialSelectedId: string
+}) {
   const [selectedId, setSelectedId] = React.useState(initialSelectedId)
   const [expandedIds, setExpandedIds] = React.useState<Set<string>>(() =>
     getDefaultExpandedIds(mockPerspectiveTree, initialSelectedId)
   )
   const [sharingOpen, setSharingOpen] = React.useState(false)
-
-  React.useEffect(() => {
-    setSelectedId(initialSelectedId)
-    setExpandedIds(getDefaultExpandedIds(mockPerspectiveTree, initialSelectedId))
-  }, [initialSelectedId])
 
   const selectedNode = React.useMemo(
     () => findPerspectiveNode(mockPerspectiveTree, selectedId) ?? null,
@@ -135,7 +143,10 @@ export function PerspectiveViewPage() {
             minSize="36%"
             className="min-h-0 min-w-0 overflow-hidden"
           >
-            <PerspectiveDocumentViewer selectedNode={selectedNode} />
+            <PerspectiveDocumentViewer
+              key={selectedNode?.id ?? "none"}
+              selectedNode={selectedNode}
+            />
           </ResizablePanel>
 
           <PerspectivePanelHandle />

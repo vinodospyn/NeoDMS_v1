@@ -66,26 +66,23 @@ export function FileExplorerToolbar({
           <FolderTreeToggleIcon />
         </Button>
 
-        <div className="relative w-[400px]">
-          <Search
-            className="pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2 text-muted-foreground"
-            aria-hidden
-          />
+        <div className={explorerSearchShellClass}>
+          <Search className={explorerSearchLeadingIconClass} aria-hidden />
           <Input
             type="search"
             value={folderSearch}
             onChange={(event) => onFolderSearchChange(event.target.value)}
             placeholder="Search in selected folder"
-            className="h-9 rounded-lg border-border/70 pr-11 pl-9 shadow-none"
+            className={explorerSearchFieldClass}
           />
           <Button
             type="button"
             variant="ghost"
             size="icon-sm"
-            className="drive-explorer-folder-toggle absolute top-1/2 right-1 size-7 shrink-0 -translate-y-1/2 rounded-[10px] border text-primary shadow-none transition-[filter] hover:brightness-[0.98]"
+            className={explorerSearchSubmitClass}
             aria-label="Search folder"
           >
-            <Search className="size-3.5" strokeWidth={2.25} aria-hidden />
+            <Search className="size-4" strokeWidth={2.25} aria-hidden />
           </Button>
         </div>
       </div>

@@ -87,18 +87,15 @@ function SidebarNavGroup({
   router: ReturnType<typeof useRouter>
 }) {
   const isGroupActive = isNavGroupActive(pathname, item)
-  const [open, setOpen] = React.useState(isGroupActive)
-
-  React.useEffect(() => {
-    if (isGroupActive) setOpen(true)
-  }, [isGroupActive])
+  const [userOpen, setUserOpen] = React.useState<boolean | undefined>(undefined)
+  const open = userOpen ?? isGroupActive
 
   if (!item.children?.length) {
     return <SidebarNavLink item={item} pathname={pathname} router={router} />
   }
 
   return (
-    <Collapsible open={open} onOpenChange={setOpen}>
+    <Collapsible open={open} onOpenChange={setUserOpen}>
       <SidebarMenuItem>
         <CollapsibleTrigger asChild>
           <SidebarMenuButton
@@ -186,7 +183,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
             <SidebarMenu className="gap-0.5">
               {navItems.map((item) => (
                 <SidebarNavGroup
-                  key={item.label}
+                  key={`${item.label}-${isNavGroupActive(pathname, item)}`}
                   item={item}
                   pathname={pathname}
                   router={router}
