@@ -550,8 +550,33 @@
 }
 
 .drive-shell .drive-search-input {
-  background: var(--light-gradient-bg);
-  border-color: transparent;
+  background-color: color-mix(in oklch, var(--foreground) 4%, var(--background));
+  border-color: color-mix(in oklch, var(--foreground) 12%, transparent);
+  color: var(--foreground);
+}
+
+.drive-shell .drive-search-input::placeholder {
+  color: var(--muted-foreground);
+}
+
+.dark .drive-shell .drive-search-input,
+.semi-dark .drive-shell .drive-search-input {
+  background-color: color-mix(in oklch, var(--foreground) 6%, var(--background));
+  border-color: rgb(255 255 255 / 16%);
+  color: var(--foreground);
+}
+
+.drive-shell .toolbar-search {
+  background-color: var(--background);
+  border-color: color-mix(in oklch, var(--foreground) 14%, transparent);
+}
+
+.drive-shell .toolbar-search input {
+  color: var(--foreground);
+}
+
+.drive-shell .toolbar-search input::placeholder {
+  color: var(--muted-foreground);
 }
 
 .drive-shell .drive-explorer-folder-toggle {
@@ -563,61 +588,28 @@
   );
 }
 
-.drive-shell .drive-explorer-search-shell {
-  border-color: color-mix(in oklch, var(--foreground) 14%, transparent);
-  background-color: var(--background);
-}
-
-.drive-shell .drive-explorer-search-leading-icon {
-  color: color-mix(in oklch, var(--blue-light) 28%, #94a3b8);
-}
-
-.drive-shell .drive-explorer-search-field {
-  color: var(--foreground);
-}
-
-.drive-shell .drive-explorer-search-field::placeholder {
-  color: color-mix(in oklch, var(--blue-light) 28%, #94a3b8);
-}
-
-.drive-shell .drive-explorer-search-submit {
-  border-color: color-mix(in oklch, var(--primary) 55%, transparent);
-  background-color: color-mix(in oklch, var(--primary) 8%, var(--background));
-  color: var(--primary);
-}
-
 .dark .drive-shell .drive-explorer-folder-toggle,
 .semi-dark .drive-shell .drive-explorer-folder-toggle {
   border-color: color-mix(in oklch, var(--primary) 28%, transparent);
   background: color-mix(in oklch, var(--primary) 12%, var(--background));
 }
 
-.dark .drive-shell .drive-explorer-search-shell,
-.semi-dark .drive-shell .drive-explorer-search-shell {
+.dark .drive-shell .toolbar-search {
   border-color: rgb(255 255 255 / 18%);
-  background-color: #000000;
+  background-color: var(--background);
 }
 
-.dark .drive-shell .drive-explorer-search-leading-icon,
-.semi-dark .drive-shell .drive-explorer-search-leading-icon {
-  color: #64748b;
+.semi-dark .drive-shell .toolbar-search {
+  border-color: color-mix(in oklch, var(--foreground) 14%, transparent);
+  background-color: var(--background);
 }
 
-.dark .drive-shell .drive-explorer-search-field,
-.semi-dark .drive-shell .drive-explorer-search-field {
-  color: #e2e8f0;
+.dark .drive-shell .toolbar-search input {
+  color: var(--foreground);
 }
 
-.dark .drive-shell .drive-explorer-search-field::placeholder,
-.semi-dark .drive-shell .drive-explorer-search-field::placeholder {
-  color: #64748b;
-}
-
-.dark .drive-shell .drive-explorer-search-submit,
-.semi-dark .drive-shell .drive-explorer-search-submit {
-  border-color: var(--primary);
-  color: var(--primary);
-  box-shadow: 0 0 10px color-mix(in oklch, var(--primary) 18%, transparent);
+.semi-dark .drive-shell .toolbar-search input {
+  color: var(--foreground);
 }
 
 .drive-shell .drive-link {

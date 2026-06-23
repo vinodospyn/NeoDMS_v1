@@ -15,6 +15,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { SidebarTrigger } from "@/components/ui/sidebar"
+import { cn } from "@/lib/utils"
 import { isNavItemActive } from "@/lib/navigation"
 
 const ROUTE_TITLES: Record<string, string> = {
@@ -45,9 +46,9 @@ function DriveSearchBar({ className }: { className?: string }) {
   const [query, setQuery] = React.useState("")
 
   return (
-    <div className={className}>
+    <div className={cn("relative", className)}>
       <Search
-        className="pointer-events-none absolute top-1/2 left-3.5 size-4 -translate-y-1/2 border-border/70 text-primary opacity-50"
+        className="pointer-events-none absolute top-1/2 left-3.5 size-4 -translate-y-1/2 text-muted-foreground"
         aria-hidden
       />
       <Input
@@ -55,14 +56,14 @@ function DriveSearchBar({ className }: { className?: string }) {
         value={query}
         onChange={(event) => setQuery(event.target.value)}
         placeholder="Search in Neo Drive"
-        className="drive-search-input h-11 rounded-full border border-border/70 pr-20 pl-10 text-sm text-primary shadow-none placeholder:text-primary/50"
+        className="drive-search-input h-11 w-full rounded-full border border-border/70 bg-muted/30 pr-20 pl-10 text-sm text-foreground shadow-none placeholder:text-muted-foreground focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/30"
       />
       {query ? (
         <Button
           type="button"
           variant="ghost"
           size="sm"
-          className="absolute top-1/2 right-1.5 h-7 -translate-y-1/2 rounded-full px-2.5 text-xs text-muted-foreground"
+          className="absolute top-1/2 right-1.5 h-7 -translate-y-1/2 rounded-full px-2.5 text-xs text-muted-foreground hover:text-foreground"
           onClick={() => setQuery("")}
         >
           <X className="mr-1 size-3" />
@@ -96,7 +97,7 @@ export function DocumentsAppHeader() {
           </div>
         </div>
         <div className="relative w-full pb-3 md:hidden">
-          <DriveSearchBar className="relative w-full" />
+          <DriveSearchBar className="w-full" />
         </div>
 
         <div className="hidden h-16 grid-cols-[minmax(0,1fr)_minmax(240px,1fr)_auto] items-center gap-4 lg:grid xl:grid-cols-[220px_minmax(320px,1fr)_auto]">
@@ -106,7 +107,7 @@ export function DocumentsAppHeader() {
               {pageTitle}
             </p>
           </div>
-          <DriveSearchBar className="relative w-full max-w-lg justify-self-center" />
+          <DriveSearchBar className="w-full max-w-lg justify-self-center" />
           <HeaderActions initials={initials} />
         </div>
       </div>

@@ -18,63 +18,77 @@ import { getDocumentViewerHeaderActions } from "@/features/drive/lib/document-vi
 import {
   findPerspectiveNode,
   formatPerspectiveSubtitle,
-  getDefaultExpandedIds,
-  getPerspectiveRootNode,
 } from "@/features/drive/lib/perspective-tree"
+import {
+  resolvePerspectiveSession,
+  type PerspectiveSession,
+} from "@/features/drive/lib/perspective-view-entry"
+import type { DriveFileKind } from "@/features/drive/lib/file-types"
 
-function getInitialSelectedId(itemId: string | null) {
-  if (itemId && findPerspectiveNode(mockPerspectiveTree, itemId)) {
-    return itemId
-  }
-  return mockPerspectiveTree[0]?.id ?? ""
+function getInitialSession(
+  itemId: string | null,
+  kind: DriveFileKind | null,
+  name: string | null
+): PerspectiveSession {
+  return resolvePerspectiveSession(mockPerspectiveTree, itemId, {
+    kind: kind ?? undefined,
+    name: name ?? undefined,
+  })
 }
 
 export function PerspectiveViewPage() {
   const searchParams = useSearchParams()
   const itemId = searchParams.get("id")
-  const initialSelectedId = React.useMemo(
-    () => getInitialSelectedId(itemId),
-    [itemId]
+  const kind = searchParams.get("kind") as DriveFileKind | null
+  const name = searchParams.get("name")
+  const initialSession = React.useMemo(
+    () => getInitialSession(itemId, kind, name),
+    [itemId, kind, name]
   )
 
   return (
     <PerspectiveViewPageContent
-      key={initialSelectedId}
-      initialSelectedId={initialSelectedId}
+      key={`${itemId ?? ""}-${kind ?? ""}-${name ?? ""}`}
+      initialSession={initialSession}
     />
   )
 }
 
 function PerspectiveViewPageContent({
-  initialSelectedId,
+  initialSession,
 }: {
-  initialSelectedId: string
+  initialSession: PerspectiveSession
 }) {
-  const [selectedId, setSelectedId] = React.useState(initialSelectedId)
-  const [expandedIds, setExpandedIds] = React.useState<Set<string>>(() =>
-    getDefaultExpandedIds(mockPerspectiveTree, initialSelectedId)
+  const [selectedId, setSelectedId] = React.useState(initialSession.selectedId)
+  const [expandedIds, setExpandedIds] = React.useState<Set<string>>(
+    () => initialSession.expandedIds
   )
   const [sharingOpen, setSharingOpen] = React.useState(false)
 
-  const selectedNode = React.useMemo(
-    () => findPerspectiveNode(mockPerspectiveTree, selectedId) ?? null,
-    [selectedId]
-  )
+  const browseTree = initialSession.tree
+  const showTree = initialSession.mode === "browse"
 
-  const rootNode = React.useMemo(
-    () => getPerspectiveRootNode(mockPerspectiveTree, initialSelectedId),
-    [initialSelectedId]
-  )
+  const selectedNode = React.useMemo(() => {
+    if (initialSession.mode === "single") {
+      return initialSession.selectedNode
+    }
 
-  const headerTitle = rootNode?.label ?? "Certificates"
+    return (
+      findPerspectiveNode(browseTree, selectedId) ??
+      findPerspectiveNode(mockPerspectiveTree, selectedId) ??
+      initialSession.contextNode
+    )
+  }, [browseTree, initialSession, selectedId])
+
+  const headerTitle = initialSession.contextNode.label
   const headerSubtitle = formatPerspectiveSubtitle(
-    rootNode?.createdAt ?? "11-02-2026"
+    initialSession.contextNode.createdAt ?? "11-02-2026"
   )
-  const headerKind = rootNode?.kind ?? "folder"
+  const headerKind = initialSession.contextNode.kind
 
   const sharingTitle = selectedNode?.label ?? headerTitle
   const sharingSubtitle = formatPerspectiveSubtitle(
-    selectedNode?.createdAt ?? rootNode?.createdAt ?? "11-02-2026"
+    selectedNode?.createdAt ?? initialSession.contextNode.createdAt ?? "11-02-2026"
   )
   const sharingKind = selectedNode?.kind ?? headerKind
   const sharingShared =
@@ -96,7 +110,7 @@ function PerspectiveViewPageContent({
         subtitle={headerSubtitle}
         kind={headerKind}
         name={headerTitle}
-        shared={rootNode?.shared}
+        shared={initialSession.contextNode.shared}
         actions={getDocumentViewerHeaderActions(headerKind)}
         backHref="/personal-space"
         onAction={handleHeaderAction}
@@ -119,27 +133,31 @@ function PerspectiveViewPageContent({
           className="h-full w-full"
           resizeTargetMinimumSize={{ coarse: 36, fine: 14 }}
         >
-          <ResizablePanel
-            id="perspective-tree"
-            defaultSize="18%"
-            minSize="14%"
-            maxSize="32%"
-            className="min-h-0 min-w-0 overflow-hidden"
-          >
-            <PerspectiveTreePanel
-              tree={mockPerspectiveTree}
-              selectedId={selectedId}
-              onSelectedIdChange={setSelectedId}
-              expandedIds={expandedIds}
-              onExpandedIdsChange={setExpandedIds}
-            />
-          </ResizablePanel>
+          {showTree ? (
+            <>
+              <ResizablePanel
+                id="perspective-tree"
+                defaultSize="18%"
+                minSize="14%"
+                maxSize="32%"
+                className="min-h-0 min-w-0 overflow-hidden"
+              >
+                <PerspectiveTreePanel
+                  tree={browseTree}
+                  selectedId={selectedId}
+                  onSelectedIdChange={setSelectedId}
+                  expandedIds={expandedIds}
+                  onExpandedIdsChange={setExpandedIds}
+                />
+              </ResizablePanel>
 
-          <PerspectivePanelHandle />
+              <PerspectivePanelHandle />
+            </>
+          ) : null}
 
           <ResizablePanel
             id="perspective-viewer"
-            defaultSize="58%"
+            defaultSize={showTree ? "58%" : "72%"}
             minSize="36%"
             className="min-h-0 min-w-0 overflow-hidden"
           >
@@ -153,7 +171,7 @@ function PerspectiveViewPageContent({
 
           <ResizablePanel
             id="perspective-info"
-            defaultSize="24%"
+            defaultSize={showTree ? "24%" : "28%"}
             minSize="18%"
             maxSize="36%"
             className="min-h-0 min-w-0 overflow-hidden"

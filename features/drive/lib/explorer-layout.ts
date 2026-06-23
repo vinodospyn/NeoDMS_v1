@@ -23,18 +23,6 @@ export const explorerFolderRowSelectedClass =
 export const explorerFolderToggleClass =
   "drive-explorer-folder-toggle size-9 shrink-0 rounded-[10px] border text-primary shadow-none transition-[filter] hover:brightness-[0.98]"
 
-export const explorerSearchShellClass =
-  " relative flex h-10 min-w-0 flex-1 items-center rounded-full border pr-1.5"
-
-export const explorerSearchLeadingIconClass =
-  " pointer-events-none absolute top-1/2 left-3.5 size-4 -translate-y-1/2"
-
-export const explorerSearchFieldClass =
-  "drive-explorer-search-field h-full min-w-0 flex-1 border-0 bg-transparent pl-10 pr-2 shadow-none focus-visible:border-0 focus-visible:ring-0"
-
-export const explorerSearchSubmitClass =
-  "drive-explorer-search-submit size-8 shrink-0 rounded-[10px] border shadow-none transition-[filter] hover:brightness-110"
-
 export function getExplorerGridTemplateColumns(
   myFoldersOpen: boolean,
   certificationOpen: boolean

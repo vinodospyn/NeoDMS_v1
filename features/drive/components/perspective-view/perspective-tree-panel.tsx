@@ -1,9 +1,9 @@
 "use client"
 
 import * as React from "react"
-import { ChevronRight, Search } from "lucide-react"
+import { ChevronRight } from "lucide-react"
 
-import { Input } from "@/components/ui/input"
+import { ToolbarSearch } from "@/components/common/toolbar-search"
 import { ScrollArea } from "@/components/ui/scroll-area"
 import { cn } from "@/lib/utils"
 import type { PerspectiveTreeNode } from "@/features/drive/data/mock-perspective-tree"
@@ -132,22 +132,16 @@ export function PerspectiveTreePanel({
   )
 
   return (
-    <aside className="flex h-full min-h-0 flex-col bg-background">
-      <div className="shrink-0 p-3 pb-2">
-        <div className="relative">
-          <Search
-            className="pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2 text-muted-foreground"
-            aria-hidden
-          />
-          <Input
-            type="search"
-            value={search}
-            onChange={(event) => setSearch(event.target.value)}
-            placeholder="Search in selected folder"
-            className="h-9 rounded-md bg-muted/30 pl-9 text-sm shadow-none"
-            aria-label="Search in selected folder"
-          />
-        </div>
+    <aside className="flex h-full min-h-0 min-w-0 flex-col bg-background">
+      <div className="min-w-0 shrink-0 p-3 pb-2">
+        <ToolbarSearch
+          value={search}
+          onChange={setSearch}
+          placeholder="Search in selected folder"
+          aria-label="Search in selected folder"
+          showSubmitButton={false}
+          width="fill"
+        />
       </div>
 
       <ScrollArea className="min-h-0 flex-1">

@@ -1,4 +1,4 @@
-import { FileTypeIcon } from "@/features/drive/components/file-type-icon/file-type-icon"
+import { DriveDocumentNameCell } from "@/features/drive/components/drive-document-name-cell"
 import {
   ActivityTypeBadge,
   PermissionBadge,
@@ -16,17 +16,7 @@ import type {
 } from "@/features/drive/types/drive-list"
 
 function renderDocumentName(item: DriveItem) {
-  return (
-    <div className="flex items-center gap-2.5">
-      <FileTypeIcon
-        name={item.name}
-        explicitType={item.type}
-        variant="compact"
-        size="md"
-      />
-      <span className="font-medium text-foreground">{item.name}</span>
-    </div>
-  )
+  return <DriveDocumentNameCell item={item} />
 }
 
 function renderDocumentType(item: DriveItem) {
@@ -55,7 +45,9 @@ export const sharedWithMeColumns: DriveListColumn<SharedWithMeItem>[] = [
     label: "Document Type",
     className: "w-[12%]",
     sortable: true,
+    filterable: true,
     getSortValue: (item) => getFileKindLabel(item.type),
+    getFilterValue: (item) => getFileKindLabel(item.type),
     render: renderDocumentType,
   },
   {
@@ -63,7 +55,9 @@ export const sharedWithMeColumns: DriveListColumn<SharedWithMeItem>[] = [
     label: "Shared By",
     className: "w-[11%]",
     sortable: true,
+    filterable: true,
     getSortValue: (item) => item.sharedBy,
+    getFilterValue: (item) => item.sharedBy,
     render: (item) => mutedText(item.sharedBy),
   },
   {
@@ -79,7 +73,9 @@ export const sharedWithMeColumns: DriveListColumn<SharedWithMeItem>[] = [
     label: "Permission",
     className: "w-[9%]",
     sortable: true,
+    filterable: true,
     getSortValue: (item) => item.permission,
+    getFilterValue: (item) => item.permission,
     render: (item) => <PermissionBadge permission={item.permission} />,
   },
   {
@@ -87,7 +83,9 @@ export const sharedWithMeColumns: DriveListColumn<SharedWithMeItem>[] = [
     label: "Department / Category",
     className: "w-[13%]",
     sortable: true,
+    filterable: true,
     getSortValue: (item) => item.department,
+    getFilterValue: (item) => item.department,
     render: (item) => mutedText(item.department),
   },
   {
@@ -122,7 +120,9 @@ export const sharedByMeColumns: DriveListColumn<SharedByMeItem>[] = [
     label: "Document Type",
     className: "w-[11%]",
     sortable: true,
+    filterable: true,
     getSortValue: (item) => getFileKindLabel(item.type),
+    getFilterValue: (item) => getFileKindLabel(item.type),
     render: renderDocumentType,
   },
   {
@@ -130,7 +130,9 @@ export const sharedByMeColumns: DriveListColumn<SharedByMeItem>[] = [
     label: "Shared With",
     className: "w-[14%]",
     sortable: true,
+    filterable: true,
     getSortValue: (item) => item.sharedWith,
+    getFilterValue: (item) => item.sharedWith,
     render: (item) => mutedText(item.sharedWith),
   },
   {
@@ -146,7 +148,9 @@ export const sharedByMeColumns: DriveListColumn<SharedByMeItem>[] = [
     label: "Permission Granted",
     className: "w-[11%]",
     sortable: true,
+    filterable: true,
     getSortValue: (item) => item.permissionGranted,
+    getFilterValue: (item) => item.permissionGranted,
     render: (item) => (
       <PermissionBadge permission={item.permissionGranted} />
     ),
@@ -191,7 +195,9 @@ export const favoritesColumns: DriveListColumn<FavoriteItem>[] = [
     label: "Document Type",
     className: "w-[11%]",
     sortable: true,
+    filterable: true,
     getSortValue: (item) => getFileKindLabel(item.type),
+    getFilterValue: (item) => getFileKindLabel(item.type),
     render: renderDocumentType,
   },
   {
@@ -199,7 +205,9 @@ export const favoritesColumns: DriveListColumn<FavoriteItem>[] = [
     label: "Location",
     className: "w-[14%]",
     sortable: true,
+    filterable: true,
     getSortValue: (item) => item.location,
+    getFilterValue: (item) => item.location,
     render: (item) => mutedText(item.location),
   },
   {
@@ -207,7 +215,9 @@ export const favoritesColumns: DriveListColumn<FavoriteItem>[] = [
     label: "Owner",
     className: "w-[10%]",
     sortable: true,
+    filterable: true,
     getSortValue: (item) => item.owner,
+    getFilterValue: (item) => item.owner,
     render: (item) => mutedText(item.owner),
   },
   {
@@ -215,7 +225,9 @@ export const favoritesColumns: DriveListColumn<FavoriteItem>[] = [
     label: "Category",
     className: "w-[9%]",
     sortable: true,
+    filterable: true,
     getSortValue: (item) => item.category,
+    getFilterValue: (item) => item.category,
     render: (item) => mutedText(item.category),
   },
   {
@@ -258,7 +270,9 @@ export const recentColumns: DriveListColumn<RecentItem>[] = [
     label: "Document Type",
     className: "w-[11%]",
     sortable: true,
+    filterable: true,
     getSortValue: (item) => getFileKindLabel(item.type),
+    getFilterValue: (item) => getFileKindLabel(item.type),
     render: renderDocumentType,
   },
   {
@@ -266,7 +280,9 @@ export const recentColumns: DriveListColumn<RecentItem>[] = [
     label: "Activity Type",
     className: "w-[10%]",
     sortable: true,
+    filterable: true,
     getSortValue: (item) => item.activityType,
+    getFilterValue: (item) => item.activityType,
     render: (item) => <ActivityTypeBadge activityType={item.activityType} />,
   },
   {
@@ -282,7 +298,9 @@ export const recentColumns: DriveListColumn<RecentItem>[] = [
     label: "Owner",
     className: "w-[10%]",
     sortable: true,
+    filterable: true,
     getSortValue: (item) => item.owner,
+    getFilterValue: (item) => item.owner,
     render: (item) => mutedText(item.owner),
   },
   {
@@ -290,7 +308,9 @@ export const recentColumns: DriveListColumn<RecentItem>[] = [
     label: "Location",
     className: "w-[12%]",
     sortable: true,
+    filterable: true,
     getSortValue: (item) => item.location,
+    getFilterValue: (item) => item.location,
     render: (item) => mutedText(item.location),
   },
   {
@@ -317,7 +337,9 @@ export const trashColumns: DriveListColumn<TrashItem>[] = [
     label: "Document Type",
     className: "w-[11%]",
     sortable: true,
+    filterable: true,
     getSortValue: (item) => getFileKindLabel(item.type),
+    getFilterValue: (item) => getFileKindLabel(item.type),
     render: renderDocumentType,
   },
   {
@@ -325,7 +347,9 @@ export const trashColumns: DriveListColumn<TrashItem>[] = [
     label: "Original Location",
     className: "w-[13%]",
     sortable: true,
+    filterable: true,
     getSortValue: (item) => item.originalLocation,
+    getFilterValue: (item) => item.originalLocation,
     render: (item) => mutedText(item.originalLocation),
   },
   {
@@ -333,7 +357,9 @@ export const trashColumns: DriveListColumn<TrashItem>[] = [
     label: "Deleted By",
     className: "w-[10%]",
     sortable: true,
+    filterable: true,
     getSortValue: (item) => item.deletedBy,
+    getFilterValue: (item) => item.deletedBy,
     render: (item) => mutedText(item.deletedBy),
   },
   {
@@ -349,7 +375,9 @@ export const trashColumns: DriveListColumn<TrashItem>[] = [
     label: "Retention Status",
     className: "w-[11%]",
     sortable: true,
+    filterable: true,
     getSortValue: (item) => item.retentionStatus,
+    getFilterValue: (item) => item.retentionStatus,
     render: (item) => (
       <RetentionStatusBadge status={item.retentionStatus} />
     ),
