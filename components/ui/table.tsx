@@ -6,12 +6,19 @@ import { ArrowDown, ArrowUp, ArrowUpDown } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { cn } from "@/lib/utils"
 
-function TableContainer({ className, ...props }: React.ComponentProps<"div">) {
+function TableContainer({
+  className,
+  variant = "card",
+  ...props
+}: React.ComponentProps<"div"> & { variant?: "card" | "flat" }) {
   return (
     <div
       data-slot="table-shell"
+      data-variant={variant}
       className={cn(
-        "overflow-hidden rounded-xl border border-border/80 bg-background shadow-sm",
+        variant === "card"
+          ? "overflow-hidden rounded-xl border border-border/80 bg-background shadow-sm"
+          : "flex min-h-0 min-w-0 w-full max-w-full flex-1 flex-col overflow-hidden bg-background",
         className
       )}
       {...props}

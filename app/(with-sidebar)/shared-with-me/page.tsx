@@ -1,6 +1,9 @@
-import { DrivePlaceholderPage } from "@/features/drive/components/drive-placeholder-page"
+import { SharedWithMeListPage } from "@/features/drive/components/shared-with-me-list-page"
 
 export default function SharedWithMePage() {
-  return <DrivePlaceholderPage title="Shared with me" />
+  return (
+    <div className="flex min-h-0 w-full flex-1 flex-col overflow-hidden">
+      <SharedWithMeListPage />
+    </div>
+  )
 }
-

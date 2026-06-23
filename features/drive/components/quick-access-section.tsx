@@ -14,7 +14,7 @@ export function QuickAccessSection() {
           Quick access
         </h2>
         <Link
-          href="/favorite"
+          href="/favorites"
           className="drive-link text-sm font-medium hover:underline"
         >
           View more

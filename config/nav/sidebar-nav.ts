@@ -3,6 +3,7 @@ import {
   Clock3,
   HardDrive,
   Home,
+  Send,
   Settings,
   Star,
   Trash2,
@@ -15,7 +16,8 @@ export const sidebarNavItems: NavItem[] = [
   { label: "Personal Space", href: "/personal-space", icon: HardDrive },
   { label: "Workspaces", href: "/workspaces", icon: HardDrive },
   { label: "Shared with me", href: "/shared-with-me", icon: Users },
-  { label: "Favorite", href: "/favorite", icon: Star },
+  { label: "Shared by me", href: "/shared-by-me", icon: Send },
+  { label: "Favorites", href: "/favorites", icon: Star },
   { label: "Recent", href: "/recent", icon: Clock3 },
   { label: "Trash", href: "/trash", icon: Trash2 },
 ]

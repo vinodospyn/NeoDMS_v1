@@ -34,11 +34,6 @@ export function WorkspaceListToolbar({
     [onSearchChange]
   )
 
-  // Sync local state if parent resets searchTerm
-  useEffect(() => {
-    setLocalSearch(searchTerm)
-  }, [searchTerm])
-
   // Cleanup timeout on unmount
   useEffect(() => {
     return () => {

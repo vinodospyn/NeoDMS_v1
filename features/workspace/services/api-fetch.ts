@@ -1,7 +1,18 @@
 import type { ApiErrorResponse } from "@/features/workspace/types"
 import { WorkspaceApiError } from "@/features/workspace/services/workspace-errors"
 
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL ?? ""
+function normalizeApiBaseUrl(raw: string | undefined): string {
+  const value = raw?.trim() ?? ""
+  if (!value) return ""
+
+  if (/^https?:\/\//i.test(value)) {
+    return value.replace(/\/+$/, "")
+  }
+
+  return `http://${value.replace(/^\/+|\/+$/g, "")}`
+}
+
+const API_BASE_URL = normalizeApiBaseUrl(process.env.NEXT_PUBLIC_API_URL)
 
 /**
  * Retrieves the current auth token.
