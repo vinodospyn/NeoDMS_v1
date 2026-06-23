@@ -616,7 +616,6 @@
 .dark .drive-shell .drive-explorer-search-submit,
 .semi-dark .drive-shell .drive-explorer-search-submit {
   border-color: var(--primary);
-  background-color: #050807;
   color: var(--primary);
   box-shadow: 0 0 10px color-mix(in oklch, var(--primary) 18%, transparent);
 }

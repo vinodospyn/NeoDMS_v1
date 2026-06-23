@@ -24,7 +24,7 @@ export const explorerFolderToggleClass =
   "drive-explorer-folder-toggle size-9 shrink-0 rounded-[10px] border text-primary shadow-none transition-[filter] hover:brightness-[0.98]"
 
 export const explorerSearchShellClass =
-  "drive-explorer-search-shell relative flex h-10 min-w-0 flex-1 items-center rounded-full border pr-1.5"
+  " relative flex h-10 min-w-0 flex-1 items-center rounded-full border pr-1.5"
 
 export const explorerSearchLeadingIconClass =
   " pointer-events-none absolute top-1/2 left-3.5 size-4 -translate-y-1/2"

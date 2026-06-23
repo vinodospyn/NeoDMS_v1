@@ -1,9 +1,9 @@
 import type { NavItem } from "@/config/nav/types"
 import {
   Clock3,
-  Folder,
   HardDrive,
   Home,
+  Send,
   Settings,
   Star,
   Trash2,
@@ -14,22 +14,10 @@ import {
 export const sidebarNavItems: NavItem[] = [
   { label: "Home", href: "/", icon: Home },
   { label: "Personal Space", href: "/personal-space", icon: HardDrive },
-  {
-    label: "Workspaces",
-    href: "/workspaces",
-    icon: HardDrive,
-    children: [
-      { label: "Finance", href: "/workspaces/finance", icon: Folder },
-      {
-        label: "Human Resource",
-        href: "/workspaces/human-resource",
-        icon: Folder,
-      },
-      { label: "Marketing", href: "/workspaces/marketing", icon: Folder },
-    ],
-  },
+  { label: "Workspaces", href: "/workspaces", icon: HardDrive },
   { label: "Shared with me", href: "/shared-with-me", icon: Users },
-  { label: "Favorite", href: "/favorite", icon: Star },
+  { label: "Shared by me", href: "/shared-by-me", icon: Send },
+  { label: "Favorites", href: "/favorites", icon: Star },
   { label: "Recent", href: "/recent", icon: Clock3 },
   { label: "Trash", href: "/trash", icon: Trash2 },
 ]

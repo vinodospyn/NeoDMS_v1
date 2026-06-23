@@ -33,37 +33,22 @@ import {
   TableSortHead,
 } from "@/components/ui/table"
 import { cn } from "@/lib/utils"
-import { mockDriveItems } from "@/features/drive/data/mock-files"
 import { DriveItemActionsMenu } from "@/features/drive/components/drive-item-actions-menu"
-import { FileTypeIcon } from "@/features/drive/components/file-type-icon/file-type-icon"
 import type { DriveItemActionHandlers } from "@/features/drive/lib/drive-item-actions"
 import { isFolderKind } from "@/features/drive/lib/perspective-tree"
+import type { DriveItem } from "@/features/drive/types"
 import type {
-  DriveItem,
-  DriveSortDirection,
-  DriveSortKey,
-} from "@/features/drive/types"
+  DriveListColumn,
+  DriveListSortDirection,
+} from "@/features/drive/types/drive-list"
 
 const ROWS_PER_PAGE = 10
 
-function compareItems(
-  a: DriveItem,
-  b: DriveItem,
-  key: DriveSortKey,
-  direction: DriveSortDirection
-): number {
-  const factor = direction === "asc" ? 1 : -1
-  if (key === "name") {
-    return a.name.localeCompare(b.name) * factor
-  }
-  return a.createdAt.localeCompare(b.createdAt) * factor
-}
-
 function toggleSort(
-  currentKey: DriveSortKey,
-  currentDirection: DriveSortDirection,
-  nextKey: DriveSortKey
-): { key: DriveSortKey; direction: DriveSortDirection } {
+  currentKey: string,
+  currentDirection: DriveListSortDirection,
+  nextKey: string
+): { key: string; direction: DriveListSortDirection } {
   if (currentKey !== nextKey) {
     return { key: nextKey, direction: "asc" }
   }
@@ -73,34 +58,49 @@ function toggleSort(
   }
 }
 
-type FileExplorerTableProps = {
-  /** When true, renders inside `FileExplorerPage` shell (no outer card). */
-  embedded?: boolean
-  folderSearch?: string
+type DriveListTableProps<T extends DriveItem> = {
+  items: T[]
+  columns: DriveListColumn<T>[]
+  defaultSortColumnId: string
+  searchTerm?: string
+  typeFilter?: string
+  minTableWidth?: string
   selectedId?: string
   onSelectedIdChange?: (id: string) => void
-  onItemFileInfo?: (item: DriveItem) => void
+  onItemFileInfo?: (item: T) => void
   actionHandlers?: DriveItemActionHandlers
+  selectedIds?: Set<string>
+  onSelectedIdsChange?: React.Dispatch<React.SetStateAction<Set<string>>>
 }
 
-export function FileExplorerTable({
-  embedded = false,
-  folderSearch = "",
+export function DriveListTable<T extends DriveItem>({
+  items,
+  columns,
+  defaultSortColumnId,
+  searchTerm = "",
+  typeFilter = "all",
+  minTableWidth = "1100px",
   selectedId: selectedIdProp,
   onSelectedIdChange,
   onItemFileInfo,
   actionHandlers,
-}: FileExplorerTableProps) {
+  selectedIds: selectedIdsProp,
+  onSelectedIdsChange,
+}: DriveListTableProps<T>) {
   const router = useRouter()
-  const [items] = React.useState(mockDriveItems)
-  const [selectedIdState, setSelectedIdState] = React.useState<string>("2")
-  const [selectedIds, setSelectedIds] = React.useState<Set<string>>(new Set())
-  const [sortKey, setSortKey] = React.useState<DriveSortKey>("name")
+  const [selectedIdState, setSelectedIdState] = React.useState<string>("")
+  const [selectedIdsState, setSelectedIdsState] = React.useState<Set<string>>(
+    new Set()
+  )
+  const [sortKey, setSortKey] = React.useState(defaultSortColumnId)
   const [sortDirection, setSortDirection] =
-    React.useState<DriveSortDirection>("asc")
+    React.useState<DriveListSortDirection>("asc")
   const [page, setPage] = React.useState(1)
   const [goToPage, setGoToPage] = React.useState("")
+
   const selectedId = selectedIdProp ?? selectedIdState
+  const selectedIds = selectedIdsProp ?? selectedIdsState
+  const setSelectedIds = onSelectedIdsChange ?? setSelectedIdsState
 
   const setSelectedId = React.useCallback(
     (id: string) => {
@@ -111,21 +111,38 @@ export function FileExplorerTable({
   )
 
   const filtered = React.useMemo(() => {
-    const term = folderSearch.trim().toLowerCase()
-    if (!term) return items
-    return items.filter((item) => item.name.toLowerCase().includes(term))
-  }, [items, folderSearch])
+    const term = searchTerm.trim().toLowerCase()
+    return items.filter((item) => {
+      const matchesSearch =
+        !term ||
+        item.name.toLowerCase().includes(term) ||
+        item.category.toLowerCase().includes(term)
+      const matchesType = typeFilter === "all" || item.type === typeFilter
+      return matchesSearch && matchesType
+    })
+  }, [items, searchTerm, typeFilter])
 
-  const sorted = React.useMemo(
-    () =>
-      [...filtered].sort((a, b) => compareItems(a, b, sortKey, sortDirection)),
-    [filtered, sortKey, sortDirection]
-  )
+  const sortColumn = columns.find((column) => column.id === sortKey)
+
+  const sorted = React.useMemo(() => {
+    const getValue =
+      sortColumn?.getSortValue ??
+      ((item: T) => {
+        if (sortKey === "name") return item.name
+        return item.createdAt
+      })
+
+    return [...filtered].sort((a, b) => {
+      const factor = sortDirection === "asc" ? 1 : -1
+      return getValue(a).localeCompare(getValue(b)) * factor
+    })
+  }, [filtered, sortColumn, sortDirection, sortKey])
 
   const totalPages = Math.max(1, Math.ceil(sorted.length / ROWS_PER_PAGE))
   const safePage = Math.min(page, totalPages)
   const pageStart = sorted.length === 0 ? 0 : (safePage - 1) * ROWS_PER_PAGE + 1
   const pageEnd = Math.min(safePage * ROWS_PER_PAGE, sorted.length)
+
   const paginated = React.useMemo(() => {
     const start = (safePage - 1) * ROWS_PER_PAGE
     return sorted.slice(start, start + ROWS_PER_PAGE)
@@ -134,7 +151,7 @@ export function FileExplorerTable({
   const allOnPageSelected =
     paginated.length > 0 && paginated.every((item) => selectedIds.has(item.id))
 
-  const handleSort = (key: DriveSortKey) => {
+  const handleSort = (key: string) => {
     const next = toggleSort(sortKey, sortDirection, key)
     setSortKey(next.key)
     setSortDirection(next.direction)
@@ -161,10 +178,8 @@ export function FileExplorerTable({
   }
 
   const getItemActionHandlers = React.useCallback(
-    (item: DriveItem): DriveItemActionHandlers => ({
-      open: () => {
-        setSelectedId(item.id)
-      },
+    (item: T): DriveItemActionHandlers => ({
+      open: () => setSelectedId(item.id),
       preview: (target) => {
         router.push(`/perspective-view?id=${target.id}`)
       },
@@ -173,17 +188,17 @@ export function FileExplorerTable({
       },
       "file-info": (target) => {
         setSelectedId(target.id)
-        onItemFileInfo?.(target)
+        onItemFileInfo?.(target as T)
       },
       ...actionHandlers,
     }),
     [actionHandlers, onItemFileInfo, router, setSelectedId]
   )
 
-  const table = (
-    <>
+  return (
+    <div className="flex min-h-0 w-full max-w-full flex-1 flex-col overflow-hidden bg-background">
       <div className="min-h-0 w-full max-w-full flex-1 overflow-auto">
-        <Table className="w-full min-w-[960px]">
+        <Table className="w-full" style={{ minWidth: minTableWidth }}>
           <TableHeader>
             <TableRow className="hover:bg-transparent">
               <TableHead className="pl-6">
@@ -195,23 +210,24 @@ export function FileExplorerTable({
                   />
                 </div>
               </TableHead>
-              <TableSortHead
-                className="min-w-[200px]"
-                sortDirection={sortKey === "name" ? sortDirection : false}
-                onSort={() => handleSort("name")}
-              >
-                Name
-              </TableSortHead>
-              <TableHead className="w-[17%]">Category</TableHead>
-
-              <TableSortHead
-                className="w-[20%]"
-                sortDirection={sortKey === "createdAt" ? sortDirection : false}
-                onSort={() => handleSort("createdAt")}
-              >
-                Created Date
-              </TableSortHead>
-              <TableHead className="w-[10%]">File Size</TableHead>
+              {columns.map((column) =>
+                column.sortable ? (
+                  <TableSortHead
+                    key={column.id}
+                    className={column.className}
+                    sortDirection={
+                      sortKey === column.id ? sortDirection : false
+                    }
+                    onSort={() => handleSort(column.id)}
+                  >
+                    {column.label}
+                  </TableSortHead>
+                ) : (
+                  <TableHead key={column.id} className={column.className}>
+                    {column.label}
+                  </TableHead>
+                )
+              )}
               <TableHead className="w-[188px] text-right">Actions</TableHead>
             </TableRow>
           </TableHeader>
@@ -245,29 +261,11 @@ export function FileExplorerTable({
                       />
                     </div>
                   </TableCell>
-                  <TableCell className="py-2">
-                    <div className="flex items-center gap-2.5">
-                      <FileTypeIcon
-                        name={item.name}
-                        explicitType={item.type}
-                        variant="compact"
-                        size="md"
-                      />
-                      <span className="font-medium text-foreground">
-                        {item.name}
-                      </span>
-                    </div>
-                  </TableCell>
-                  <TableCell className="py-2 text-muted-foreground">
-                    {item.category}
-                  </TableCell>
-
-                  <TableCell className="py-2 text-muted-foreground">
-                    {item.createdAt}
-                  </TableCell>
-                  <TableCell className="py-2 text-muted-foreground">
-                    {item.fileSize ?? "--"}
-                  </TableCell>
+                  {columns.map((column) => (
+                    <TableCell key={column.id} className="py-2">
+                      {column.render(item)}
+                    </TableCell>
+                  ))}
                   <TableCell
                     className="py-2 text-right"
                     onClick={(event) => event.stopPropagation()}
@@ -384,12 +382,14 @@ export function FileExplorerTable({
           </div>
         </div>
       </TableFooterBar>
-    </>
+    </div>
   )
+}
 
-  if (embedded) {
-    return <TableContainer variant="flat">{table}</TableContainer>
-  }
-
-  return <TableContainer>{table}</TableContainer>
+export function DriveListTableContainer({
+  children,
+}: {
+  children: React.ReactNode
+}) {
+  return <TableContainer variant="flat">{children}</TableContainer>
 }

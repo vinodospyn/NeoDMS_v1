@@ -1,5 +1,5 @@
-import { DrivePlaceholderPage } from "@/features/drive/components/drive-placeholder-page"
+import { redirect } from "next/navigation"
 
-export default function FavoritePage() {
-  return <DrivePlaceholderPage title="Favorite" />
+export default function FavoriteRedirectPage() {
+  redirect("/favorites")
 }
