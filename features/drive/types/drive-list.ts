@@ -9,7 +9,9 @@ export type DriveListColumn<T extends DriveItem> = {
   label: string
   className?: string
   sortable?: boolean
+  filterable?: boolean
   getSortValue?: (item: T) => string
+  getFilterValue?: (item: T) => string
   render: (item: T) => ReactNode
 }
 

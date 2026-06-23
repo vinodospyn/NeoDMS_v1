@@ -18,9 +18,17 @@ import {
   EXPLORER_DRAWER_TRANSITION_MS,
   explorerDrawerEdgeRightClass,
 } from "@/features/drive/lib/explorer-layout"
-import type { DriveFileKind } from "@/features/drive/lib/file-types"
 import type { DriveItem } from "@/features/drive/types"
 import type { DriveListColumn } from "@/features/drive/types/drive-list"
+import {
+  buildColumnFilterSections,
+  createEmptyColumnFilters,
+  filterItemsByColumns,
+  getColumnSearchValues,
+  getFilterableColumnIds,
+  type ColumnFilterState,
+} from "@/features/drive/lib/table-column-filter"
+import type { DriveViewMode } from "@/features/drive/types/view-mode"
 
 type DriveListPageProps<T extends DriveItem> = {
   items: T[]
@@ -40,14 +48,27 @@ export function DriveListPage<T extends DriveItem>({
   minTableWidth,
 }: DriveListPageProps<T>) {
   const [search, setSearch] = React.useState("")
-  const [typeFilter, setTypeFilter] = React.useState<DriveFileKind | "all">(
-    "all"
+  const filterableColumnIds = React.useMemo(
+    () => getFilterableColumnIds(columns),
+    [columns]
   )
+  const [columnFilters, setColumnFilters] = React.useState<ColumnFilterState>(
+    () => createEmptyColumnFilters(filterableColumnIds)
+  )
+  const filterSections = React.useMemo(
+    () => buildColumnFilterSections(items, columns),
+    [items, columns]
+  )
+
+  React.useEffect(() => {
+    setColumnFilters(createEmptyColumnFilters(filterableColumnIds))
+  }, [filterableColumnIds])
   const [selectedItemId, setSelectedItemId] = React.useState(
     () => items[0]?.id ?? ""
   )
   const [selectedIds, setSelectedIds] = React.useState<Set<string>>(new Set())
   const [quickViewOpen, setQuickViewOpen] = React.useState(false)
+  const [viewMode, setViewMode] = React.useState<DriveViewMode>("list")
 
   const selectedItem = React.useMemo(
     () => items.find((item) => item.id === selectedItemId) ?? null,
@@ -74,10 +95,13 @@ export function DriveListPage<T extends DriveItem>({
             searchPlaceholder={searchPlaceholder}
             selectedCount={selectedIds.size}
             bulkVariant={bulkVariant}
-            typeFilter={typeFilter}
-            onTypeFilterChange={setTypeFilter}
+            filterSections={filterSections}
+            columnFilters={columnFilters}
+            onColumnFiltersChange={setColumnFilters}
             quickViewOpen={quickViewOpen}
             onToggleQuickView={() => setQuickViewOpen((open) => !open)}
+            viewMode={viewMode}
+            onViewModeChange={setViewMode}
           />
           <DriveListTableContainer>
             <DriveListTable
@@ -85,13 +109,14 @@ export function DriveListPage<T extends DriveItem>({
               columns={columns}
               defaultSortColumnId={defaultSortColumnId}
               searchTerm={search}
-              typeFilter={typeFilter}
+              columnFilters={columnFilters}
               minTableWidth={minTableWidth}
               selectedId={selectedItemId}
               onSelectedIdChange={setSelectedItemId}
               onItemFileInfo={() => setQuickViewOpen(true)}
               selectedIds={selectedIds}
               onSelectedIdsChange={setSelectedIds}
+              viewMode={viewMode}
             />
           </DriveListTableContainer>
         </div>

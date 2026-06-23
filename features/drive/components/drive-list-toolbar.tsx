@@ -8,31 +8,20 @@ import {
   Info,
   List,
   RotateCcw,
-  Search,
   Share2,
-  SlidersHorizontal,
   Star,
   Trash2,
 } from "lucide-react"
 
+import { ToolbarSearch } from "@/components/common/toolbar-search"
+import { TableColumnFilter } from "@/components/common/table-column-filter"
 import { Button } from "@/components/ui/button"
-import {
-  DropdownMenu,
-  DropdownMenuCheckboxItem,
-  DropdownMenuContent,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu"
-import { Input } from "@/components/ui/input"
 import { cn } from "@/lib/utils"
-import {
-  explorerSearchFieldClass,
-  explorerSearchLeadingIconClass,
-  explorerSearchShellClass,
-  explorerSearchSubmitClass,
-} from "@/features/drive/lib/explorer-layout"
-import { getFileKindLabel, type DriveFileKind } from "@/features/drive/lib/file-types"
+import type {
+  ColumnFilterSection,
+  ColumnFilterState,
+} from "@/features/drive/lib/table-column-filter"
+import type { DriveViewMode } from "@/features/drive/types/view-mode"
 
 export type DriveListBulkVariant = "default" | "favorites" | "trash"
 
@@ -42,23 +31,14 @@ type DriveListToolbarProps = {
   searchPlaceholder?: string
   selectedCount: number
   bulkVariant?: DriveListBulkVariant
-  typeFilter: DriveFileKind | "all"
-  onTypeFilterChange: (value: DriveFileKind | "all") => void
+  filterSections: ColumnFilterSection[]
+  columnFilters: ColumnFilterState
+  onColumnFiltersChange: (filters: ColumnFilterState) => void
   quickViewOpen: boolean
   onToggleQuickView: () => void
+  viewMode: DriveViewMode
+  onViewModeChange: (mode: DriveViewMode) => void
 }
-
-const FILTER_TYPES: Array<{ value: DriveFileKind | "all"; label: string }> = [
-  { value: "all", label: "All types" },
-  { value: "folder", label: getFileKindLabel("folder") },
-  { value: "shared-folder", label: getFileKindLabel("shared-folder") },
-  { value: "pdf", label: getFileKindLabel("pdf") },
-  { value: "word", label: getFileKindLabel("word") },
-  { value: "excel", label: getFileKindLabel("excel") },
-  { value: "ppt", label: getFileKindLabel("ppt") },
-  { value: "zip", label: getFileKindLabel("zip") },
-  { value: "txt", label: getFileKindLabel("txt") },
-]
 
 function ToolbarDivider() {
   return <span className="mx-1 h-5 w-px shrink-0 bg-border/80" aria-hidden />
@@ -70,13 +50,14 @@ export function DriveListToolbar({
   searchPlaceholder = "Search documents",
   selectedCount,
   bulkVariant = "default",
-  typeFilter,
-  onTypeFilterChange,
+  filterSections,
+  columnFilters,
+  onColumnFiltersChange,
   quickViewOpen,
   onToggleQuickView,
+  viewMode,
+  onViewModeChange,
 }: DriveListToolbarProps) {
-  const [viewMode, setViewMode] = React.useState<"list" | "grid">("list")
-
   return (
     <div className="flex shrink-0 flex-col border-b border-border/60 bg-background">
       {selectedCount > 0 ? (
@@ -121,27 +102,12 @@ export function DriveListToolbar({
       ) : null}
 
       <div className="flex items-center justify-between gap-3 px-3 py-2.5">
-        <div className="flex min-w-0 flex-1 items-center gap-2.5">
-          <div className={explorerSearchShellClass}>
-            <Search className={explorerSearchLeadingIconClass} aria-hidden />
-            <Input
-              type="search"
-              value={search}
-              onChange={(event) => onSearchChange(event.target.value)}
-              placeholder={searchPlaceholder}
-              className={explorerSearchFieldClass}
-            />
-            <Button
-              type="button"
-              variant="ghost"
-              size="icon-sm"
-              className={explorerSearchSubmitClass}
-              aria-label="Search"
-            >
-              <Search className="size-4" strokeWidth={2.25} aria-hidden />
-            </Button>
-          </div>
-        </div>
+        <ToolbarSearch
+          value={search}
+          onChange={onSearchChange}
+          placeholder={searchPlaceholder}
+          aria-label={searchPlaceholder}
+        />
 
         <div className="flex shrink-0 items-center gap-2">
           <div
@@ -161,7 +127,7 @@ export function DriveListToolbar({
               )}
               aria-label="List view"
               aria-pressed={viewMode === "list"}
-              onClick={() => setViewMode("list")}
+              onClick={() => onViewModeChange("list")}
             >
               <List className="size-4" />
             </Button>
@@ -177,7 +143,7 @@ export function DriveListToolbar({
               )}
               aria-label="Grid view"
               aria-pressed={viewMode === "grid"}
-              onClick={() => setViewMode("grid")}
+              onClick={() => onViewModeChange("grid")}
             >
               <Grid3x3 className="size-4" />
             </Button>
@@ -195,35 +161,11 @@ export function DriveListToolbar({
               <ArrowDownUp className="size-4" />
             </Button>
             <ToolbarDivider />
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button
-                  type="button"
-                  variant="ghost"
-                  size="icon-sm"
-                  className={cn(
-                    "size-8 text-muted-foreground hover:text-foreground",
-                    typeFilter !== "all" && "bg-primary/10 text-primary"
-                  )}
-                  aria-label="Filter by type"
-                >
-                  <SlidersHorizontal className="size-4" />
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="end" className="w-52">
-                <DropdownMenuLabel>Document type</DropdownMenuLabel>
-                <DropdownMenuSeparator />
-                {FILTER_TYPES.map((option) => (
-                  <DropdownMenuCheckboxItem
-                    key={option.value}
-                    checked={typeFilter === option.value}
-                    onCheckedChange={() => onTypeFilterChange(option.value)}
-                  >
-                    {option.label}
-                  </DropdownMenuCheckboxItem>
-                ))}
-              </DropdownMenuContent>
-            </DropdownMenu>
+            <TableColumnFilter
+              sections={filterSections}
+              filters={columnFilters}
+              onFiltersChange={onColumnFiltersChange}
+            />
             <ToolbarDivider />
             <Button
               type="button"

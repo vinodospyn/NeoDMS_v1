@@ -21,7 +21,7 @@ import {
   Users,
 } from "lucide-react"
 
-import { cn } from "@/lib/utils"
+import { Button } from "@/components/ui/button"
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -29,15 +29,15 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
-import { TableRowAction } from "@/components/ui/table"
 import {
-  getDriveItemActions,
+  getGridCardMenuActions,
   type DriveItemAction,
   type DriveItemActionHandlers,
   type DriveItemActionId,
 } from "@/features/drive/lib/drive-item-actions"
 import { buildPerspectiveViewHref } from "@/features/drive/lib/perspective-view-entry"
 import type { DriveItem } from "@/features/drive/types"
+import { cn } from "@/lib/utils"
 
 const ACTION_ICONS: Record<
   DriveItemActionId,
@@ -60,10 +60,7 @@ const ACTION_ICONS: Record<
   "move-to-trash": Trash2,
 }
 
-type DriveItemActionsMenuProps = {
-  item: DriveItem
-  handlers?: DriveItemActionHandlers
-}
+const GRID_QUICK_ACTION_COUNT = 4
 
 function shouldShowSeparator(
   current: DriveItemAction,
@@ -72,12 +69,17 @@ function shouldShowSeparator(
   return previous != null && previous.group !== current.group
 }
 
-export function DriveItemActionsMenu({
+type DriveGridCardActionsProps = {
+  item: DriveItem
+  handlers: DriveItemActionHandlers
+}
+
+export function DriveGridCardActions({
   item,
-  handlers = {},
-}: DriveItemActionsMenuProps) {
+  handlers,
+}: DriveGridCardActionsProps) {
   const router = useRouter()
-  const actions = React.useMemo(() => getDriveItemActions(item), [item])
+  const actions = React.useMemo(() => getGridCardMenuActions(item), [item])
 
   const handleSelect = (actionId: DriveItemActionId) => {
     const handler = handlers[actionId]
@@ -102,16 +104,20 @@ export function DriveItemActionsMenu({
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <TableRowAction
+        <Button
           type="button"
-          visibility="always"
-          className="size-8 shrink-0"
-          aria-label={`More actions for ${item.name}`}
+          variant="ghost"
+          size="icon-sm"
+          className={cn(
+            "size-7 shrink-0 text-muted-foreground opacity-0 transition-opacity",
+            "group-hover:opacity-100 focus-visible:opacity-100"
+          )}
+          aria-label={`Actions for ${item.name}`}
           onClick={(event) => event.stopPropagation()}
           onPointerDown={(event) => event.stopPropagation()}
         >
           <MoreVertical className="size-4" />
-        </TableRowAction>
+        </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent
         align="end"
@@ -121,9 +127,13 @@ export function DriveItemActionsMenu({
         {actions.map((action, index) => {
           const Icon = ACTION_ICONS[action.id]
           const previous = index > 0 ? actions[index - 1] : undefined
+          const showQuickDivider =
+            index === GRID_QUICK_ACTION_COUNT && actions.length > GRID_QUICK_ACTION_COUNT
+
           return (
             <React.Fragment key={action.id}>
-              {shouldShowSeparator(action, previous) ? (
+              {showQuickDivider ? <DropdownMenuSeparator /> : null}
+              {!showQuickDivider && shouldShowSeparator(action, previous) ? (
                 <DropdownMenuSeparator />
               ) : null}
               <DropdownMenuItem
@@ -134,7 +144,9 @@ export function DriveItemActionsMenu({
                 <Icon
                   className={cn(
                     "size-4",
-                    action.variant !== "destructive" && "text-muted-foreground"
+                    action.id === "star" && item.starred
+                      ? "fill-amber-400 text-amber-400"
+                      : action.variant !== "destructive" && "text-muted-foreground"
                   )}
                 />
                 {action.label}

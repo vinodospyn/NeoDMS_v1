@@ -2,12 +2,6 @@
 
 import * as React from "react"
 import { useRouter } from "next/navigation"
-import {
-  Download,
-  ExternalLink,
-  Share2,
-  Star,
-} from "lucide-react"
 
 import { Button } from "@/components/ui/button"
 import { Checkbox } from "@/components/ui/checkbox"
@@ -28,19 +22,24 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-  TableRowAction,
-  TableRowActions,
   TableSortHead,
 } from "@/components/ui/table"
-import { cn } from "@/lib/utils"
-import { DriveItemActionsMenu } from "@/features/drive/components/drive-item-actions-menu"
+import { DriveTableRowActions } from "@/features/drive/components/drive-table-row-actions"
+import { DriveGridCardActions } from "@/features/drive/components/drive-grid-card-actions"
+import { DriveItemGrid } from "@/features/drive/components/drive-item-grid"
 import type { DriveItemActionHandlers } from "@/features/drive/lib/drive-item-actions"
-import { isFolderKind } from "@/features/drive/lib/perspective-tree"
+import { buildPerspectiveViewHref } from "@/features/drive/lib/perspective-view-entry"
 import type { DriveItem } from "@/features/drive/types"
 import type {
   DriveListColumn,
   DriveListSortDirection,
 } from "@/features/drive/types/drive-list"
+import type { DriveViewMode } from "@/features/drive/types/view-mode"
+import {
+  filterItemsByColumns,
+  getColumnSearchValues,
+  type ColumnFilterState,
+} from "@/features/drive/lib/table-column-filter"
 
 const ROWS_PER_PAGE = 10
 
@@ -63,7 +62,7 @@ type DriveListTableProps<T extends DriveItem> = {
   columns: DriveListColumn<T>[]
   defaultSortColumnId: string
   searchTerm?: string
-  typeFilter?: string
+  columnFilters?: ColumnFilterState
   minTableWidth?: string
   selectedId?: string
   onSelectedIdChange?: (id: string) => void
@@ -71,6 +70,7 @@ type DriveListTableProps<T extends DriveItem> = {
   actionHandlers?: DriveItemActionHandlers
   selectedIds?: Set<string>
   onSelectedIdsChange?: React.Dispatch<React.SetStateAction<Set<string>>>
+  viewMode?: DriveViewMode
 }
 
 export function DriveListTable<T extends DriveItem>({
@@ -78,7 +78,7 @@ export function DriveListTable<T extends DriveItem>({
   columns,
   defaultSortColumnId,
   searchTerm = "",
-  typeFilter = "all",
+  columnFilters = {},
   minTableWidth = "1100px",
   selectedId: selectedIdProp,
   onSelectedIdChange,
@@ -86,6 +86,7 @@ export function DriveListTable<T extends DriveItem>({
   actionHandlers,
   selectedIds: selectedIdsProp,
   onSelectedIdsChange,
+  viewMode = "list",
 }: DriveListTableProps<T>) {
   const router = useRouter()
   const [selectedIdState, setSelectedIdState] = React.useState<string>("")
@@ -97,6 +98,13 @@ export function DriveListTable<T extends DriveItem>({
     React.useState<DriveListSortDirection>("asc")
   const [page, setPage] = React.useState(1)
   const [goToPage, setGoToPage] = React.useState("")
+  const [starredOverrides, setStarredOverrides] = React.useState<
+    Record<string, boolean>
+  >({})
+
+  React.useEffect(() => {
+    setPage(1)
+  }, [searchTerm, columnFilters])
 
   const selectedId = selectedIdProp ?? selectedIdState
   const selectedIds = selectedIdsProp ?? selectedIdsState
@@ -112,15 +120,19 @@ export function DriveListTable<T extends DriveItem>({
 
   const filtered = React.useMemo(() => {
     const term = searchTerm.trim().toLowerCase()
-    return items.filter((item) => {
-      const matchesSearch =
-        !term ||
-        item.name.toLowerCase().includes(term) ||
-        item.category.toLowerCase().includes(term)
-      const matchesType = typeFilter === "all" || item.type === typeFilter
-      return matchesSearch && matchesType
-    })
-  }, [items, searchTerm, typeFilter])
+    const searched = !term
+      ? items
+      : items.filter((item) => {
+          const columnValues = getColumnSearchValues(item, columns)
+          return (
+            item.name.toLowerCase().includes(term) ||
+            item.category.toLowerCase().includes(term) ||
+            columnValues.some((value) => value.toLowerCase().includes(term))
+          )
+        })
+
+    return filterItemsByColumns(searched, columns, columnFilters)
+  }, [items, searchTerm, columns, columnFilters])
 
   const sortColumn = columns.find((column) => column.id === sortKey)
 
@@ -181,19 +193,135 @@ export function DriveListTable<T extends DriveItem>({
     (item: T): DriveItemActionHandlers => ({
       open: () => setSelectedId(item.id),
       preview: (target) => {
-        router.push(`/perspective-view?id=${target.id}`)
+        router.push(buildPerspectiveViewHref(target))
       },
       "open-perspective": (target) => {
-        router.push(`/perspective-view?id=${target.id}`)
+        router.push(buildPerspectiveViewHref(target))
       },
       "file-info": (target) => {
         setSelectedId(target.id)
         onItemFileInfo?.(target as T)
       },
+      share: (target) => {
+        actionHandlers?.share?.(target)
+      },
+      download: (target) => {
+        actionHandlers?.download?.(target)
+      },
       ...actionHandlers,
+      star: (target) => {
+        setStarredOverrides((current) => ({
+          ...current,
+          [target.id]: !(current[target.id] ?? Boolean(target.starred)),
+        }))
+        actionHandlers?.star?.(target)
+      },
     }),
     [actionHandlers, onItemFileInfo, router, setSelectedId]
   )
+
+  const resolveItem = React.useCallback(
+    (item: T) => ({
+      ...item,
+      starred: starredOverrides[item.id] ?? item.starred,
+    }),
+    [starredOverrides]
+  )
+
+  const paginationFooter = (
+    <TableFooterBar className="mt-auto shrink-0 border-t border-border/60 bg-background px-4 py-2.5">
+      <p className="text-sm text-muted-foreground">
+        Showing {pageStart}-{pageEnd} of {sorted.length}
+      </p>
+      <div className="flex flex-wrap items-center gap-2 sm:justify-end">
+        <Pagination className="mx-0 w-auto">
+          <PaginationContent>
+            <PaginationItem>
+              <PaginationPrevious
+                href="#"
+                onClick={(event) => {
+                  event.preventDefault()
+                  setPage((current) => Math.max(current - 1, 1))
+                }}
+                aria-disabled={safePage === 1}
+                className={
+                  safePage === 1 ? "pointer-events-none opacity-50" : ""
+                }
+              />
+            </PaginationItem>
+            <PaginationItem>
+              <span className="px-2 text-sm text-muted-foreground">
+                {safePage} of {totalPages}
+              </span>
+            </PaginationItem>
+            <PaginationItem>
+              <PaginationNext
+                href="#"
+                onClick={(event) => {
+                  event.preventDefault()
+                  setPage((current) => Math.min(current + 1, totalPages))
+                }}
+                aria-disabled={safePage === totalPages}
+                className={
+                  safePage === totalPages
+                    ? "pointer-events-none opacity-50"
+                    : ""
+                }
+              />
+            </PaginationItem>
+          </PaginationContent>
+        </Pagination>
+        <div className="flex items-center gap-2">
+          <span className="text-sm text-muted-foreground">Go to page</span>
+          <Input
+            type="number"
+            min={1}
+            max={totalPages}
+            value={goToPage}
+            onChange={(event) => setGoToPage(event.target.value)}
+            onKeyDown={(event) => {
+              if (event.key === "Enter") handleGoToPage()
+            }}
+            className="h-9 w-16 px-2 text-center"
+            aria-label="Go to page number"
+          />
+          <Button
+            type="button"
+            size="sm"
+            className="primary-button h-9 px-4"
+            onClick={handleGoToPage}
+          >
+            Go
+          </Button>
+        </div>
+      </div>
+    </TableFooterBar>
+  )
+
+  if (viewMode === "grid") {
+    return (
+      <div className="flex min-h-0 w-full max-w-full flex-1 flex-col overflow-hidden bg-background">
+        <div className="min-h-0 w-full max-w-full flex-1 overflow-auto">
+          <DriveItemGrid
+            items={paginated.map(resolveItem)}
+            selectedId={selectedId}
+            onSelectedIdChange={setSelectedId}
+            selectedIds={selectedIds}
+            onSelectedIdsChange={setSelectedIds}
+            renderActions={(item) => (
+              <DriveGridCardActions
+                item={item}
+                handlers={getItemActionHandlers(
+                  items.find((entry) => entry.id === item.id) ?? item
+                )}
+              />
+            )}
+          />
+        </div>
+        {paginationFooter}
+      </div>
+    )
+  }
 
   return (
     <div className="flex min-h-0 w-full max-w-full flex-1 flex-col overflow-hidden bg-background">
@@ -233,6 +361,7 @@ export function DriveListTable<T extends DriveItem>({
           </TableHeader>
           <TableBody>
             {paginated.map((item) => {
+              const resolvedItem = resolveItem(item)
               const isSelected = selectedId === item.id
               const isChecked = selectedIds.has(item.id)
               return (
@@ -263,51 +392,14 @@ export function DriveListTable<T extends DriveItem>({
                   </TableCell>
                   {columns.map((column) => (
                     <TableCell key={column.id} className="py-2">
-                      {column.render(item)}
+                      {column.render(resolvedItem)}
                     </TableCell>
                   ))}
-                  <TableCell
-                    className="py-2 text-right"
-                    onClick={(event) => event.stopPropagation()}
-                  >
-                    <TableRowActions>
-                      <TableRowAction
-                        type="button"
-                        aria-label={item.starred ? "Unstar" : "Star"}
-                      >
-                        <Star
-                          className={cn(
-                            "size-4",
-                            item.starred
-                              ? "fill-amber-400 text-amber-400"
-                              : "opacity-70"
-                          )}
-                        />
-                      </TableRowAction>
-                      <TableRowAction type="button" aria-label="Share">
-                        <Share2 className="size-4" />
-                      </TableRowAction>
-                      {!isFolderKind(item.type) ? (
-                        <TableRowAction type="button" aria-label="Download">
-                          <Download className="size-4" />
-                        </TableRowAction>
-                      ) : null}
-                      {!isFolderKind(item.type) ? (
-                        <TableRowAction
-                          type="button"
-                          aria-label="Open in perspective view"
-                          onClick={() =>
-                            router.push(`/perspective-view?id=${item.id}`)
-                          }
-                        >
-                          <ExternalLink className="size-4" />
-                        </TableRowAction>
-                      ) : null}
-                      <DriveItemActionsMenu
-                        item={item}
-                        handlers={getItemActionHandlers(item)}
-                      />
-                    </TableRowActions>
+                  <TableCell className="py-2 text-right">
+                    <DriveTableRowActions
+                      item={resolvedItem}
+                      handlers={getItemActionHandlers(item)}
+                    />
                   </TableCell>
                 </TableRow>
               )
@@ -315,73 +407,7 @@ export function DriveListTable<T extends DriveItem>({
           </TableBody>
         </Table>
       </div>
-      <TableFooterBar className="mt-auto shrink-0 border-t border-border/60 bg-background px-4 py-2.5">
-        <p className="text-sm text-muted-foreground">
-          Showing {pageStart}-{pageEnd} of {sorted.length}
-        </p>
-        <div className="flex flex-wrap items-center gap-2 sm:justify-end">
-          <Pagination className="mx-0 w-auto">
-            <PaginationContent>
-              <PaginationItem>
-                <PaginationPrevious
-                  href="#"
-                  onClick={(event) => {
-                    event.preventDefault()
-                    setPage((current) => Math.max(current - 1, 1))
-                  }}
-                  aria-disabled={safePage === 1}
-                  className={
-                    safePage === 1 ? "pointer-events-none opacity-50" : ""
-                  }
-                />
-              </PaginationItem>
-              <PaginationItem>
-                <span className="px-2 text-sm text-muted-foreground">
-                  {safePage} of {totalPages}
-                </span>
-              </PaginationItem>
-              <PaginationItem>
-                <PaginationNext
-                  href="#"
-                  onClick={(event) => {
-                    event.preventDefault()
-                    setPage((current) => Math.min(current + 1, totalPages))
-                  }}
-                  aria-disabled={safePage === totalPages}
-                  className={
-                    safePage === totalPages
-                      ? "pointer-events-none opacity-50"
-                      : ""
-                  }
-                />
-              </PaginationItem>
-            </PaginationContent>
-          </Pagination>
-          <div className="flex items-center gap-2">
-            <span className="text-sm text-muted-foreground">Go to page</span>
-            <Input
-              type="number"
-              min={1}
-              max={totalPages}
-              value={goToPage}
-              onChange={(event) => setGoToPage(event.target.value)}
-              onKeyDown={(event) => {
-                if (event.key === "Enter") handleGoToPage()
-              }}
-              className="h-9 w-16 px-2 text-center"
-              aria-label="Go to page number"
-            />
-            <Button
-              type="button"
-              size="sm"
-              className="primary-button h-9 px-4"
-              onClick={handleGoToPage}
-            >
-              Go
-            </Button>
-          </div>
-        </div>
-      </TableFooterBar>
+      {paginationFooter}
     </div>
   )
 }

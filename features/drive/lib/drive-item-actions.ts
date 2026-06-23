@@ -149,6 +149,42 @@ export function getDriveItemActions(item: DriveItem): DriveItemAction[] {
   )
 }
 
+const GRID_QUICK_ACTION_IDS: DriveItemActionId[] = [
+  "star",
+  "share",
+  "download",
+  "open-perspective",
+]
+
+/** Grid card ⋮ menu: four quick actions first, then the full per-type action list. */
+export function getGridCardMenuActions(item: DriveItem): DriveItemAction[] {
+  const itemActions = getDriveItemActions(item)
+
+  const quickActions: DriveItemAction[] = GRID_QUICK_ACTION_IDS.map((id) => {
+    const existing = itemActions.find((action) => action.id === id)
+    if (existing) return existing
+
+    const fallbackLabels: Partial<Record<DriveItemActionId, string>> = {
+      "open-perspective": "Open in perspective view",
+      share: "Share",
+      download: "Download",
+      star: item.starred ? "Remove from favorites" : "Add to favorites",
+    }
+
+    return {
+      id,
+      label: fallbackLabels[id] ?? id,
+      group: "primary",
+    }
+  })
+
+  const remaining = itemActions.filter(
+    (action) => !GRID_QUICK_ACTION_IDS.includes(action.id)
+  )
+
+  return [...quickActions, ...remaining]
+}
+
 export type DriveItemActionHandlers = Partial<
   Record<DriveItemActionId, (item: DriveItem) => void>
 >

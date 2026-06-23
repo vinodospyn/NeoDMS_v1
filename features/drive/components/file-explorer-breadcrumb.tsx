@@ -55,7 +55,7 @@ export function FileExplorerBreadcrumb({
 }: FileExplorerBreadcrumbProps) {
   return (
     <Breadcrumb className={cn("min-w-0 flex-1 overflow-hidden", className)}>
-      <BreadcrumbList className="flex-nowrap gap-1 overflow-hidden">
+      <BreadcrumbList className="flex-nowrap gap-1.5 overflow-hidden">
         <BreadcrumbItem className="shrink-0">
           <BreadcrumbLink
             href="#"

@@ -2,13 +2,6 @@
 
 import * as React from "react"
 import { useRouter } from "next/navigation"
-import {
-  Download,
-  ExternalLink,
-  MoreVertical,
-  Share2,
-  Star,
-} from "lucide-react"
 
 import { Button } from "@/components/ui/button"
 import { Checkbox } from "@/components/ui/checkbox"
@@ -29,14 +22,15 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-  TableRowAction,
-  TableRowActions,
   TableSortHead,
 } from "@/components/ui/table"
-import { FileTypeIcon } from "@/features/drive/components/file-type-icon/file-type-icon"
+import { DriveDocumentNameCell } from "@/features/drive/components/drive-document-name-cell"
+import { DriveTableRowActions } from "@/features/drive/components/drive-table-row-actions"
 import { recentFileItems } from "@/features/drive/data/mock-dashboard"
 import type { RecentFileItem } from "@/features/drive/data/mock-dashboard"
-import type { DriveSortDirection } from "@/features/drive/types"
+import type { DriveItemActionHandlers } from "@/features/drive/lib/drive-item-actions"
+import { buildPerspectiveViewHref } from "@/features/drive/lib/perspective-view-entry"
+import type { DriveItem, DriveSortDirection } from "@/features/drive/types"
 
 const ROWS_PER_PAGE = 10
 
@@ -73,9 +67,25 @@ function getCategory(item: RecentFileItem) {
   return item.tag?.label ?? "--"
 }
 
+function toDriveItem(item: RecentFileItem, starred?: boolean): DriveItem {
+  return {
+    id: item.id,
+    name: item.name,
+    type: item.type,
+    category: getCategory(item),
+    workspace: item.subtitle,
+    createdAt: item.openedAt,
+    fileSize: null,
+    starred,
+  }
+}
+
 export function RecentFilesTable() {
   const router = useRouter()
   const [items] = React.useState(recentFileItems)
+  const [starredOverrides, setStarredOverrides] = React.useState<
+    Record<string, boolean>
+  >({})
   const [selectedId, setSelectedId] = React.useState<string>(items[0]?.id ?? "")
   const [selectedIds, setSelectedIds] = React.useState<Set<string>>(new Set())
   const [sortKey, setSortKey] = React.useState<RecentSortKey>("name")
@@ -128,6 +138,30 @@ export function RecentFilesTable() {
     setGoToPage("")
   }
 
+  const getItemActionHandlers = React.useCallback(
+    (item: RecentFileItem): DriveItemActionHandlers => ({
+      open: () => setSelectedId(item.id),
+      preview: (target) => {
+        router.push(buildPerspectiveViewHref(target))
+      },
+      "open-perspective": (target) => {
+        router.push(buildPerspectiveViewHref(target))
+      },
+      "file-info": (target) => {
+        setSelectedId(target.id)
+      },
+      share: () => {},
+      download: () => {},
+      star: (target) => {
+        setStarredOverrides((current) => ({
+          ...current,
+          [target.id]: !current[target.id],
+        }))
+      },
+    }),
+    [router, setSelectedId]
+  )
+
   return (
     <TableContainer>
       <div className="min-h-0 w-full max-w-full flex-1 overflow-auto">
@@ -166,6 +200,7 @@ export function RecentFilesTable() {
             {paginated.map((item) => {
               const isSelected = selectedId === item.id
               const isChecked = selectedIds.has(item.id)
+              const driveItem = toDriveItem(item, starredOverrides[item.id])
               return (
                 <TableRow
                   key={item.id}
@@ -193,17 +228,7 @@ export function RecentFilesTable() {
                     </div>
                   </TableCell>
                   <TableCell className="py-2">
-                    <div className="flex items-center gap-2.5">
-                      <FileTypeIcon
-                        name={item.name}
-                        explicitType={item.type}
-                        variant="compact"
-                        size="md"
-                      />
-                      <span className="font-medium text-foreground">
-                        {item.name}
-                      </span>
-                    </div>
+                    <DriveDocumentNameCell item={driveItem} />
                   </TableCell>
                   <TableCell className="py-2 text-muted-foreground">
                     {getCategory(item)}
@@ -212,37 +237,11 @@ export function RecentFilesTable() {
                     {item.openedAt}
                   </TableCell>
                   <TableCell className="py-2 text-muted-foreground">--</TableCell>
-                  <TableCell
-                    className="py-2 text-right"
-                    onClick={(event) => event.stopPropagation()}
-                  >
-                    <TableRowActions>
-                      <TableRowAction type="button" aria-label="Star">
-                        <Star className="size-4 opacity-70" />
-                      </TableRowAction>
-                      <TableRowAction type="button" aria-label="Share">
-                        <Share2 className="size-4" />
-                      </TableRowAction>
-                      <TableRowAction type="button" aria-label="Download">
-                        <Download className="size-4" />
-                      </TableRowAction>
-                      <TableRowAction
-                        type="button"
-                        aria-label="Open in perspective view"
-                        onClick={() =>
-                          router.push(`/perspective-view?id=${item.id}`)
-                        }
-                      >
-                        <ExternalLink className="size-4" />
-                      </TableRowAction>
-                      <TableRowAction
-                        type="button"
-                        visibility="always"
-                        aria-label="More actions"
-                      >
-                        <MoreVertical className="size-4" />
-                      </TableRowAction>
-                    </TableRowActions>
+                  <TableCell className="py-2 text-right">
+                    <DriveTableRowActions
+                      item={driveItem}
+                      handlers={getItemActionHandlers(item)}
+                    />
                   </TableCell>
                 </TableRow>
               )

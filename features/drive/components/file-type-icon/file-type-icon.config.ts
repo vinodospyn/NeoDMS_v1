@@ -32,6 +32,7 @@ export const BRAND_SIZE_CLASS = {
   sm: { box: "size-7", folder: "size-9", icon: "size-5", star: "size-2.5" },
   md: { box: "size-8", folder: "size-12", icon: "size-6", star: "size-3" },
   lg: { box: "size-10", folder: "size-14", icon: "size-7", star: "size-3.5" },
+  xl: { box: "size-16", folder: "size-[4.5rem]", icon: "size-10", star: "size-4" },
 } as const
 
 export const COMPACT_SIZE_CLASS = {
