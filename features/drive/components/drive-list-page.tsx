@@ -23,8 +23,6 @@ import type { DriveListColumn } from "@/features/drive/types/drive-list"
 import {
   buildColumnFilterSections,
   createEmptyColumnFilters,
-  filterItemsByColumns,
-  getColumnSearchValues,
   getFilterableColumnIds,
   type ColumnFilterState,
 } from "@/features/drive/lib/table-column-filter"
@@ -55,14 +53,17 @@ export function DriveListPage<T extends DriveItem>({
   const [columnFilters, setColumnFilters] = React.useState<ColumnFilterState>(
     () => createEmptyColumnFilters(filterableColumnIds)
   )
+  const [prevFilterableColumnIds, setPrevFilterableColumnIds] =
+    React.useState(filterableColumnIds)
+  if (filterableColumnIds !== prevFilterableColumnIds) {
+    setPrevFilterableColumnIds(filterableColumnIds)
+    setColumnFilters(createEmptyColumnFilters(filterableColumnIds))
+  }
   const filterSections = React.useMemo(
     () => buildColumnFilterSections(items, columns),
     [items, columns]
   )
 
-  React.useEffect(() => {
-    setColumnFilters(createEmptyColumnFilters(filterableColumnIds))
-  }, [filterableColumnIds])
   const [selectedItemId, setSelectedItemId] = React.useState(
     () => items[0]?.id ?? ""
   )

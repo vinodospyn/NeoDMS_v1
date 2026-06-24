@@ -101,10 +101,13 @@ export function DriveListTable<T extends DriveItem>({
   const [starredOverrides, setStarredOverrides] = React.useState<
     Record<string, boolean>
   >({})
-
-  React.useEffect(() => {
+  const paginationResetKey = JSON.stringify({ searchTerm, columnFilters })
+  const [prevPaginationResetKey, setPrevPaginationResetKey] =
+    React.useState(paginationResetKey)
+  if (paginationResetKey !== prevPaginationResetKey) {
+    setPrevPaginationResetKey(paginationResetKey)
     setPage(1)
-  }, [searchTerm, columnFilters])
+  }
 
   const selectedId = selectedIdProp ?? selectedIdState
   const selectedIds = selectedIdsProp ?? selectedIdsState
