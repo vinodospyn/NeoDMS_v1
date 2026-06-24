@@ -1,5 +1,7 @@
-import { WorkspaceListPage } from "@/features/workspace/components/workspace-list-page"
+import { redirect } from "next/navigation"
 
-export default function WorkspacesPage() {
-  return <WorkspaceListPage />
+import { getDefaultWorkspaceSlug } from "@/features/workspace/data/mock-workspace-content"
+
+export default function WorkspacesIndexPage() {
+  redirect(`/workspaces/${getDefaultWorkspaceSlug()}`)
 }

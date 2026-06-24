@@ -10,11 +10,19 @@ import {
   Users,
 } from "lucide-react"
 
+/** Collapsible workspaces group — children loaded dynamically from Workspace Management. */
+export const workspacesSidebarNavItem: NavItem = {
+  label: "Workspaces",
+  href: "/workspaces",
+  icon: HardDrive,
+  expandOnly: true,
+  matchDescendants: true,
+}
+
 /** Primary drive navigation (matches DMS sidebar design). */
 export const sidebarNavItems: NavItem[] = [
   { label: "Home", href: "/", icon: Home },
   { label: "Personal Space", href: "/personal-space", icon: HardDrive },
-  { label: "Workspaces", href: "/workspaces", icon: HardDrive },
   { label: "Shared with me", href: "/shared-with-me", icon: Users },
   { label: "Shared by me", href: "/shared-by-me", icon: Send },
   { label: "Favorites", href: "/favorites", icon: Star },
@@ -27,6 +35,7 @@ export const sidebarSettingsNavItem: NavItem = {
   label: "Settings",
   href: "/settings",
   icon: Settings,
+  matchDescendants: true,
 }
 
 export function flattenSidebarNavItems(items: NavItem[]): NavItem[] {

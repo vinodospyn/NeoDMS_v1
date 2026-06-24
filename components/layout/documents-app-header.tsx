@@ -11,6 +11,8 @@ import {
   flattenSidebarNavItems,
   sidebarSettingsNavItem,
 } from "@/config/nav/sidebar-nav"
+import { getSettingsPageTitle } from "@/features/settings/lib/navigation"
+import { getWorkspacePageTitle } from "@/features/workspace/lib/workspace-title"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -21,9 +23,6 @@ import { isNavItemActive } from "@/lib/navigation"
 const ROUTE_TITLES: Record<string, string> = {
   "/": "Home",
   "/personal-space": "Personal Space",
-  "/workspaces/finance": "Finance",
-  "/workspaces/human-resource": "Human Resource",
-  "/workspaces/marketing": "Marketing",
   "/shared-with-me": "Shared with me",
   "/shared-by-me": "Shared by me",
   "/favorites": "Favorites",
@@ -33,12 +32,20 @@ const ROUTE_TITLES: Record<string, string> = {
 }
 
 function getPageTitle(pathname: string): string {
+  const settingsTitle = getSettingsPageTitle(pathname)
+  if (settingsTitle) return settingsTitle
+  const workspaceTitle = getWorkspacePageTitle(pathname)
+  if (workspaceTitle) return workspaceTitle
   if (ROUTE_TITLES[pathname]) return ROUTE_TITLES[pathname]
   const navItems = [
     ...flattenSidebarNavItems(getSidebarNavItems()),
     sidebarSettingsNavItem,
   ]
-  const active = navItems.find((item) => isNavItemActive(pathname, item.href))
+  const active = navItems.find((item) =>
+    isNavItemActive(pathname, item.href, {
+      matchDescendants: item.matchDescendants,
+    })
+  )
   return active?.label ?? "Home"
 }
 

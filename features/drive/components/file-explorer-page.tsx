@@ -10,6 +10,7 @@ import { FileExplorerToolbar } from "@/features/drive/components/file-explorer-t
 import { MyFoldersDrawer } from "@/features/drive/components/my-folders-drawer"
 import { mockDriveItems } from "@/features/drive/data/mock-files"
 import { mockFolderTree } from "@/features/drive/data/mock-folder-tree"
+import type { FileExplorerContext } from "@/features/drive/types/explorer-context"
 import { useCollapseAppSidebarForFoldersDrawer } from "@/features/drive/hooks/use-collapse-app-sidebar-for-explorer"
 import { explorerTableFilterColumns } from "@/features/drive/lib/explorer-table-columns"
 import {
@@ -29,7 +30,18 @@ import {
 import { driveExplorerChromeSectionClass } from "@/features/drive/lib/drive-grid-layout"
 import type { DriveViewMode } from "@/features/drive/types/view-mode"
 
-export function FileExplorerPage() {
+export function FileExplorerPage({
+  context,
+}: {
+  context?: FileExplorerContext
+} = {}) {
+  const driveItems = context?.items ?? mockDriveItems
+  const rootLabel = context?.rootLabel ?? "Personal Space"
+  const rootHref = context?.rootHref ?? "#"
+  const pathCrumbs = context?.pathCrumbs ?? undefined
+  const defaultFolderLabel =
+    context?.defaultFolderLabel ?? "u1210 - Arunkumar"
+
   const [folderSearch, setFolderSearch] = React.useState("")
   const filterableColumnIds = React.useMemo(
     () => getFilterableColumnIds(explorerTableFilterColumns),
@@ -39,8 +51,8 @@ export function FileExplorerPage() {
     () => createEmptyColumnFilters(filterableColumnIds)
   )
   const filterSections = React.useMemo(
-    () => buildColumnFilterSections(mockDriveItems, explorerTableFilterColumns),
-    []
+    () => buildColumnFilterSections(driveItems, explorerTableFilterColumns),
+    [driveItems]
   )
   const [selectedFolderId, setSelectedFolderId] = React.useState("u1210")
   const [selectedItemId, setSelectedItemId] = React.useState("2")
@@ -52,14 +64,13 @@ export function FileExplorerPage() {
   useCollapseAppSidebarForFoldersDrawer(myFoldersDrawerOpen)
 
   const selectedItem = React.useMemo(
-    () => mockDriveItems.find((item) => item.id === selectedItemId) ?? null,
-    [selectedItemId]
+    () => driveItems.find((item) => item.id === selectedItemId) ?? null,
+    [driveItems, selectedItemId]
   )
 
   const activeFolderLabel = React.useMemo(
-    () =>
-      findFolderLabel(mockFolderTree, selectedFolderId) ?? "u1210 - Arunkumar",
-    [selectedFolderId]
+    () => findFolderLabel(mockFolderTree, selectedFolderId) ?? defaultFolderLabel,
+    [defaultFolderLabel, selectedFolderId]
   )
 
   const toggleMyFoldersDrawer = React.useCallback(() => {
@@ -114,6 +125,9 @@ export function FileExplorerPage() {
         <div className="flex min-h-0 min-w-0 flex-col overflow-hidden">
           <div className={driveExplorerChromeSectionClass}>
             <FileExplorerBreadcrumb
+              rootLabel={rootLabel}
+              rootHref={rootHref}
+              {...(pathCrumbs ? { pathCrumbs } : {})}
               activeFolderLabel={activeFolderLabel}
               onFileInfo={openCertificationDrawer}
             />
@@ -134,6 +148,7 @@ export function FileExplorerPage() {
 
           <div className="flex min-h-0 min-w-0 flex-1 flex-col overflow-hidden">
             <FileExplorerTable
+              items={driveItems}
               folderSearch={folderSearch}
               columnFilters={columnFilters}
               embedded

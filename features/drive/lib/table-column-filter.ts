@@ -1,3 +1,4 @@
+import type { DriveItem } from "@/features/drive/types"
 import type { DriveListColumn } from "@/features/drive/types/drive-list"
 
 export const ALL_FILTER_VALUE = "all"
@@ -98,7 +99,7 @@ export function filterItemsByColumns<T>(
   return items.filter((item) => matchesColumnFilters(item, columns, filters))
 }
 
-export function getColumnSearchValues<T>(
+export function getColumnSearchValues<T extends DriveItem>(
   item: T,
   columns: DriveListColumn<T>[]
 ) {

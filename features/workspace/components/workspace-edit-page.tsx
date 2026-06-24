@@ -7,6 +7,7 @@ import { Skeleton } from "@/components/ui/skeleton"
 import { WorkspaceForm } from "@/features/workspace/components/workspace-form"
 import { useWorkspace } from "@/features/workspace/hooks/use-workspace"
 import { useUpdateWorkspace } from "@/features/workspace/hooks/use-update-workspace"
+import { workspaceSettingsRoutes } from "@/features/workspace/lib/routes"
 import { WorkspaceApiError, getErrorMessage } from "@/features/workspace/services/workspace-errors"
 
 interface WorkspaceEditPageProps {
@@ -37,7 +38,7 @@ export function WorkspaceEditPage({ workspaceId }: WorkspaceEditPageProps) {
 
   if (isError || !workspace) {
     toast.error("Workspace not found")
-    router.push("/workspaces")
+    router.push(workspaceSettingsRoutes.list)
     return null
   }
 
@@ -47,12 +48,12 @@ export function WorkspaceEditPage({ workspaceId }: WorkspaceEditPageProps) {
       {
         onSuccess: () => {
           toast.success("Workspace updated")
-          router.push("/workspaces")
+          router.push(workspaceSettingsRoutes.list)
         },
         onError: (error) => {
           if (error instanceof WorkspaceApiError && error.status === 404) {
             toast.error("Workspace not found")
-            router.push("/workspaces")
+            router.push(workspaceSettingsRoutes.list)
           } else {
             toast.error(getErrorMessage(error))
           }
@@ -73,7 +74,7 @@ export function WorkspaceEditPage({ workspaceId }: WorkspaceEditPageProps) {
         }}
         onSubmit={handleSubmit}
         isSubmitting={updateMutation.isPending}
-        onCancel={() => router.push("/workspaces")}
+        onCancel={() => router.push(workspaceSettingsRoutes.list)}
       />
     </div>
   )

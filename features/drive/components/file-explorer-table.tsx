@@ -75,6 +75,7 @@ function toggleSort(
 type FileExplorerTableProps = {
   /** When true, renders inside `FileExplorerPage` shell (no outer card). */
   embedded?: boolean
+  items?: DriveItem[]
   folderSearch?: string
   columnFilters?: ColumnFilterState
   selectedId?: string
@@ -86,6 +87,7 @@ type FileExplorerTableProps = {
 
 export function FileExplorerTable({
   embedded = false,
+  items: itemsProp,
   folderSearch = "",
   columnFilters = {},
   selectedId: selectedIdProp,
@@ -95,8 +97,10 @@ export function FileExplorerTable({
   viewMode = "list",
 }: FileExplorerTableProps) {
   const router = useRouter()
-  const [items, setItems] = React.useState(mockDriveItems)
-  const [selectedIdState, setSelectedIdState] = React.useState<string>("2")
+  const [items, setItems] = React.useState(itemsProp ?? mockDriveItems)
+  const [selectedIdState, setSelectedIdState] = React.useState<string>(
+    () => (itemsProp ?? mockDriveItems)[0]?.id ?? "1"
+  )
   const [selectedIds, setSelectedIds] = React.useState<Set<string>>(new Set())
   const [sortKey, setSortKey] = React.useState<DriveSortKey>("name")
   const [sortDirection, setSortDirection] =
@@ -104,6 +108,15 @@ export function FileExplorerTable({
   const [page, setPage] = React.useState(1)
   const [goToPage, setGoToPage] = React.useState("")
   const selectedId = selectedIdProp ?? selectedIdState
+
+  React.useEffect(() => {
+    if (itemsProp) {
+      setItems(itemsProp)
+      setSelectedIdState(itemsProp[0]?.id ?? "1")
+      setSelectedIds(new Set())
+      setPage(1)
+    }
+  }, [itemsProp])
 
   React.useEffect(() => {
     setPage(1)

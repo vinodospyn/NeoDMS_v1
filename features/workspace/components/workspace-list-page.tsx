@@ -4,6 +4,7 @@ import { useState } from "react"
 import { useRouter } from "next/navigation"
 
 import { useWorkspaces } from "@/features/workspace/hooks/use-workspaces"
+import { workspaceSettingsRoutes } from "@/features/workspace/lib/routes"
 import { WorkspaceListTable } from "@/features/workspace/components/workspace-list-table"
 import { WorkspaceListToolbar } from "@/features/workspace/components/workspace-list-toolbar"
 import { WorkspaceDeleteDialog } from "@/features/workspace/components/workspace-delete-dialog"
@@ -55,11 +56,11 @@ export function WorkspaceListPage() {
   }
 
   function handleCreateClick() {
-    router.push("/workspaces/new")
+    router.push(workspaceSettingsRoutes.new)
   }
 
   function handleEdit(workspace: WorkspaceSummaryResponse) {
-    router.push(`/workspaces/${workspace.id}/edit`)
+    router.push(workspaceSettingsRoutes.edit(workspace.id))
   }
 
   function handleDelete(workspace: WorkspaceSummaryResponse) {
