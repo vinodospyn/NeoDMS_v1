@@ -8,13 +8,17 @@ import { cn } from "@/lib/utils"
 
 function TableContainer({
   className,
+  variant = "card",
   ...props
-}: React.ComponentProps<"div">) {
+}: React.ComponentProps<"div"> & { variant?: "card" | "flat" }) {
   return (
     <div
       data-slot="table-shell"
+      data-variant={variant}
       className={cn(
-        "overflow-hidden rounded-xl border border-border/80 bg-background shadow-sm",
+        variant === "card"
+          ? "overflow-hidden rounded-xl border border-border/80 bg-background shadow-sm"
+          : "flex min-h-0 min-w-0 w-full max-w-full flex-1 flex-col overflow-hidden bg-background",
         className
       )}
       {...props}
@@ -95,8 +99,8 @@ function TableHead({ className, ...props }: React.ComponentProps<"th">) {
     <th
       data-slot="table-head"
       className={cn(
-        "h-11 px-4 text-left align-middle text-sm font-medium whitespace-nowrap text-muted-foreground",
-        "[&:has([role=checkbox])]:w-12 [&:has([role=checkbox])]:px-3 [&:has([role=checkbox])]:pr-0",
+        "h-11 bg-secondary px-4 text-left align-middle text-sm font-medium whitespace-nowrap text-muted-foreground",
+        "[&:has([role=checkbox])]:w-12 [&:has([role=checkbox])]:px-3 [&:has([role=checkbox])]:pr-0 [&:has([role=checkbox])]:py-0",
         className
       )}
       {...props}
@@ -138,7 +142,7 @@ function TableSortHead({
       <button
         type="button"
         onClick={onSort}
-        className="inline-flex items-center gap-1.5 rounded-sm font-medium text-muted-foreground transition-colors hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/50"
+        className="inline-flex items-center gap-1.5 rounded-sm font-medium text-muted-foreground transition-colors hover:text-foreground focus-visible:ring-2 focus-visible:ring-ring/50 focus-visible:outline-none"
       >
         {children}
         <SortIcon
@@ -158,8 +162,8 @@ function TableCell({ className, ...props }: React.ComponentProps<"td">) {
     <td
       data-slot="table-cell"
       className={cn(
-        "px-4 py-3 align-middle whitespace-nowrap text-sm text-foreground",
-        "[&:has([role=checkbox])]:w-12 [&:has([role=checkbox])]:px-3 [&:has([role=checkbox])]:pr-0",
+        "px-4 py-3 align-middle text-sm whitespace-nowrap text-foreground",
+        "[&:has([role=checkbox])]:w-12 [&:has([role=checkbox])]:px-3 [&:has([role=checkbox])]:pr-0 [&:has([role=checkbox])]:py-0",
         className
       )}
       {...props}
@@ -180,10 +184,7 @@ function TableCaption({
   )
 }
 
-function TableFooterBar({
-  className,
-  ...props
-}: React.ComponentProps<"div">) {
+function TableFooterBar({ className, ...props }: React.ComponentProps<"div">) {
   return (
     <div
       data-slot="table-footer-bar"
@@ -208,17 +209,20 @@ function TableRowActions({ className, ...props }: React.ComponentProps<"div">) {
 
 const tableRowActionVisibilityClass = {
   hover: cn(
-    "pointer-events-none invisible opacity-0 transition-[opacity,visibility] duration-150",
-    "group-hover:pointer-events-auto group-hover:visible group-hover:opacity-100",
-    "group-focus-within:pointer-events-auto group-focus-within:visible group-focus-within:opacity-100",
-    "group-data-[state=selected]:pointer-events-auto group-data-[state=selected]:visible group-data-[state=selected]:opacity-100",
-    "focus-visible:pointer-events-auto focus-visible:visible focus-visible:opacity-100"
+    "pointer-events-none opacity-0 transition-opacity duration-150",
+    "group-hover:pointer-events-auto group-hover:opacity-100",
+    "focus-visible:pointer-events-auto focus-visible:opacity-100"
   ),
-  always: "",
+  /** Hidden until row hover — does not reveal on row focus-within (e.g. after starring). */
+  collapsedHover: cn(
+    "hidden group-hover:inline-flex",
+    "focus-visible:inline-flex"
+  ),
+  always: "opacity-100",
 } as const
 
 type TableRowActionProps = React.ComponentProps<typeof Button> & {
-  /** `hover` hides until row hover/focus/selection; `always` stays visible (e.g. more menu). */
+  /** `hover` / `collapsedHover` hide until row hover; `always` stays visible. */
   visibility?: keyof typeof tableRowActionVisibilityClass
 }
 

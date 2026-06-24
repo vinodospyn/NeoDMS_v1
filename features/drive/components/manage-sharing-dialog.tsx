@@ -109,12 +109,16 @@ export function ManageSharingDialog({
   const [members, setMembers] = React.useState<ShareMember[]>(mockShareMembers)
   const [groups, setGroups] = React.useState<ShareGroup[]>(mockShareGroups)
 
-  React.useEffect(() => {
-    if (open) {
-      setMembers(mockShareMembers)
-      setGroups(mockShareGroups)
-    }
-  }, [open])
+  const handleOpenChange = React.useCallback(
+    (nextOpen: boolean) => {
+      if (nextOpen) {
+        setMembers(mockShareMembers)
+        setGroups(mockShareGroups)
+      }
+      onOpenChange(nextOpen)
+    },
+    [onOpenChange]
+  )
 
   const updateMemberPermission = (id: string, permission: SharePermission) => {
     setMembers((current) =>
@@ -141,7 +145,7 @@ export function ManageSharingDialog({
   }
 
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
+    <Dialog open={open} onOpenChange={handleOpenChange}>
       <DialogContent
         showCloseButton
         className="flex flex-col gap-0 overflow-hidden rounded-2xl p-0 sm:max-h-[90vh] sm:min-h-[520px] sm:max-w-[480px]"
@@ -235,7 +239,7 @@ export function ManageSharingDialog({
           <Button
             type="button"
             className="primary-button h-10 w-full rounded-xl text-sm font-semibold"
-            onClick={() => onOpenChange(false)}
+            onClick={() => handleOpenChange(false)}
           >
             Share
           </Button>

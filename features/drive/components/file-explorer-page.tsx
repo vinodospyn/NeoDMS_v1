@@ -1,58 +1,76 @@
 "use client"
 
 import * as React from "react"
-import { ChevronDown, Home } from "lucide-react"
 
-import {
-  Breadcrumb,
-  BreadcrumbItem,
-  BreadcrumbLink,
-  BreadcrumbList,
-  BreadcrumbPage,
-  BreadcrumbSeparator,
-} from "@/components/ui/breadcrumb"
 import { cn } from "@/lib/utils"
 import { CertificationDrawer } from "@/features/drive/components/certification-drawer"
+import { FileExplorerBreadcrumb } from "@/features/drive/components/file-explorer-breadcrumb"
 import { FileExplorerTable } from "@/features/drive/components/file-explorer-table"
 import { FileExplorerToolbar } from "@/features/drive/components/file-explorer-toolbar"
 import { MyFoldersDrawer } from "@/features/drive/components/my-folders-drawer"
 import { mockDriveItems } from "@/features/drive/data/mock-files"
 import { mockFolderTree } from "@/features/drive/data/mock-folder-tree"
+import type { FileExplorerContext } from "@/features/drive/types/explorer-context"
 import { useCollapseAppSidebarForFoldersDrawer } from "@/features/drive/hooks/use-collapse-app-sidebar-for-explorer"
+import { explorerTableFilterColumns } from "@/features/drive/lib/explorer-table-columns"
+import {
+  buildColumnFilterSections,
+  createEmptyColumnFilters,
+  getFilterableColumnIds,
+  type ColumnFilterState,
+} from "@/features/drive/lib/table-column-filter"
 import {
   EXPLORER_DRAWER_EASE,
   EXPLORER_DRAWER_TRANSITION_MS,
-  explorerChromeBarClass,
   explorerDrawerEdgeLeftClass,
   explorerDrawerEdgeRightClass,
   findFolderLabel,
   getExplorerGridTemplateColumns,
 } from "@/features/drive/lib/explorer-layout"
+import { driveExplorerChromeSectionClass } from "@/features/drive/lib/drive-grid-layout"
+import type { DriveViewMode } from "@/features/drive/types/view-mode"
 
-const STATIC_CRUMBS = [
-  { label: "My Files", href: "#" },
-  { label: "On-boarding", href: "#" },
-  { label: "Employees", href: "#" },
-] as const
+export function FileExplorerPage({
+  context,
+}: {
+  context?: FileExplorerContext
+} = {}) {
+  const driveItems = context?.items ?? mockDriveItems
+  const rootLabel = context?.rootLabel ?? "Personal Space"
+  const rootHref = context?.rootHref ?? "#"
+  const pathCrumbs = context?.pathCrumbs ?? undefined
+  const defaultFolderLabel =
+    context?.defaultFolderLabel ?? "u1210 - Arunkumar"
 
-export function FileExplorerPage() {
   const [folderSearch, setFolderSearch] = React.useState("")
+  const filterableColumnIds = React.useMemo(
+    () => getFilterableColumnIds(explorerTableFilterColumns),
+    []
+  )
+  const [columnFilters, setColumnFilters] = React.useState<ColumnFilterState>(
+    () => createEmptyColumnFilters(filterableColumnIds)
+  )
+  const filterSections = React.useMemo(
+    () => buildColumnFilterSections(driveItems, explorerTableFilterColumns),
+    [driveItems]
+  )
   const [selectedFolderId, setSelectedFolderId] = React.useState("u1210")
   const [selectedItemId, setSelectedItemId] = React.useState("2")
   const [myFoldersDrawerOpen, setMyFoldersDrawerOpen] = React.useState(false)
   const [certificationDrawerOpen, setCertificationDrawerOpen] =
     React.useState(false)
+  const [viewMode, setViewMode] = React.useState<DriveViewMode>("list")
 
   useCollapseAppSidebarForFoldersDrawer(myFoldersDrawerOpen)
 
   const selectedItem = React.useMemo(
-    () => mockDriveItems.find((item) => item.id === selectedItemId) ?? null,
-    [selectedItemId]
+    () => driveItems.find((item) => item.id === selectedItemId) ?? null,
+    [driveItems, selectedItemId]
   )
 
   const activeFolderLabel = React.useMemo(
-    () => findFolderLabel(mockFolderTree, selectedFolderId) ?? "u1210 - Arunkumar",
-    [selectedFolderId]
+    () => findFolderLabel(mockFolderTree, selectedFolderId) ?? defaultFolderLabel,
+    [defaultFolderLabel, selectedFolderId]
   )
 
   const toggleMyFoldersDrawer = React.useCallback(() => {
@@ -71,6 +89,10 @@ export function FileExplorerPage() {
     setCertificationDrawerOpen(false)
   }, [])
 
+  const openCertificationDrawer = React.useCallback(() => {
+    setCertificationDrawerOpen(true)
+  }, [])
+
   const gridTemplateColumns = getExplorerGridTemplateColumns(
     myFoldersDrawerOpen,
     certificationDrawerOpen
@@ -79,7 +101,7 @@ export function FileExplorerPage() {
   return (
     <div className="flex h-full min-h-0 w-full flex-1 flex-col overflow-hidden">
       <div
-        className="grid h-full min-h-0 w-full overflow-hidden rounded-xl border border-border/70 bg-background shadow-sm"
+        className="grid h-full min-h-0 w-full overflow-hidden"
         style={{
           gridTemplateColumns,
           transition: `grid-template-columns ${EXPLORER_DRAWER_TRANSITION_MS}ms ${EXPLORER_DRAWER_EASE}`,
@@ -101,53 +123,39 @@ export function FileExplorerPage() {
         </div>
 
         <div className="flex min-h-0 min-w-0 flex-col overflow-hidden">
-          <div className={explorerChromeBarClass}>
-            <Breadcrumb className="min-w-0 flex-1 overflow-hidden">
-              <BreadcrumbList className="flex-nowrap gap-1 overflow-hidden text-sm">
-                <BreadcrumbItem className="shrink-0">
-                  <BreadcrumbLink
-                    href="#"
-                    className="inline-flex items-center text-muted-foreground hover:text-foreground"
-                  >
-                    <Home className="size-3.5" aria-hidden />
-                    <span className="sr-only">Home</span>
-                  </BreadcrumbLink>
-                </BreadcrumbItem>
-                <BreadcrumbSeparator className="shrink-0" />
-                {STATIC_CRUMBS.map((crumb) => (
-                  <React.Fragment key={crumb.label}>
-                    <BreadcrumbItem className="hidden shrink-0 sm:block">
-                      <BreadcrumbLink href={crumb.href}>
-                        {crumb.label}
-                      </BreadcrumbLink>
-                    </BreadcrumbItem>
-                    <BreadcrumbSeparator className="hidden shrink-0 sm:block" />
-                  </React.Fragment>
-                ))}
-                <BreadcrumbItem className="min-w-0">
-                  <BreadcrumbPage className="inline-flex max-w-full items-center gap-1 truncate font-medium">
-                    <span className="truncate">{activeFolderLabel}</span>
-                    <ChevronDown className="size-3.5 shrink-0 text-muted-foreground" />
-                  </BreadcrumbPage>
-                </BreadcrumbItem>
-              </BreadcrumbList>
-            </Breadcrumb>
-          </div>
-
-          <div className="flex min-h-0 min-w-0 flex-1 flex-col overflow-hidden">
+          <div className={driveExplorerChromeSectionClass}>
+            <FileExplorerBreadcrumb
+              rootLabel={rootLabel}
+              rootHref={rootHref}
+              {...(pathCrumbs ? { pathCrumbs } : {})}
+              activeFolderLabel={activeFolderLabel}
+              onFileInfo={openCertificationDrawer}
+            />
             <FileExplorerToolbar
               folderSearch={folderSearch}
               onFolderSearchChange={setFolderSearch}
+              filterSections={filterSections}
+              columnFilters={columnFilters}
+              onColumnFiltersChange={setColumnFilters}
               myFoldersOpen={myFoldersDrawerOpen}
               onToggleMyFolders={toggleMyFoldersDrawer}
               certificationOpen={certificationDrawerOpen}
               onToggleCertification={toggleCertificationDrawer}
+              viewMode={viewMode}
+              onViewModeChange={setViewMode}
             />
+          </div>
+
+          <div className="flex min-h-0 min-w-0 flex-1 flex-col overflow-hidden">
             <FileExplorerTable
+              items={driveItems}
               folderSearch={folderSearch}
+              columnFilters={columnFilters}
               embedded
               selectedId={selectedItemId}
               onSelectedIdChange={setSelectedItemId}
+              onItemFileInfo={openCertificationDrawer}
+              viewMode={viewMode}
             />
           </div>
         </div>

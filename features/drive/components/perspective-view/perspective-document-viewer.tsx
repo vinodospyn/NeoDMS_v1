@@ -1,6 +1,7 @@
 "use client"
 
 import * as React from "react"
+import Image from "next/image"
 import { Maximize2, Minus, Plus, RotateCw, Search } from "lucide-react"
 
 import { Button } from "@/components/ui/button"
@@ -19,7 +20,7 @@ const ZOOM_STEPS = [50, 75, 100, 125, 150, 200] as const
 function FolderPreviewUnavailable() {
   return (
     <div className="flex min-h-0 flex-1 flex-col items-center justify-center gap-5 px-6 py-12 text-center">
-      <img
+      <Image
         src="/assets/perspective/folder-preview-empty.svg"
         alt=""
         width={220}
@@ -135,11 +136,6 @@ export function PerspectiveDocumentViewer({
     }
     await element.requestFullscreen()
   }, [])
-
-  React.useEffect(() => {
-    setZoomIndex(2)
-    setRotation(0)
-  }, [selectedNode?.id])
 
   return (
     <section

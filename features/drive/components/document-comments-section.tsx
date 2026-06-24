@@ -98,29 +98,20 @@ export function DocumentCommentsSection({
   const nodeId = selectedNode?.id ?? "none"
   const canComment = isPerspectiveDocument(selectedNode)
 
+  const baseComments = React.useMemo(() => {
+    if (!selectedNode) {
+      return []
+    }
+
+    return canComment ? getDocumentComments(selectedNode) : []
+  }, [canComment, selectedNode])
+
   const [commentsByDocument, setCommentsByDocument] = React.useState<
     Record<string, DocumentComment[]>
   >({})
   const [draft, setDraft] = React.useState("")
 
-  React.useEffect(() => {
-    if (!selectedNode) {
-      return
-    }
-
-    setCommentsByDocument((current) => {
-      if (current[nodeId]) {
-        return current
-      }
-
-      return {
-        ...current,
-        [nodeId]: canComment ? getDocumentComments(selectedNode) : [],
-      }
-    })
-  }, [canComment, nodeId, selectedNode])
-
-  const comments = commentsByDocument[nodeId] ?? []
+  const comments = commentsByDocument[nodeId] ?? baseComments
 
   const handleSend = React.useCallback(() => {
     const message = draft.trim()
@@ -145,10 +136,10 @@ export function DocumentCommentsSection({
 
     setCommentsByDocument((current) => ({
       ...current,
-      [nodeId]: [...(current[nodeId] ?? []), newComment],
+      [nodeId]: [...(current[nodeId] ?? baseComments), newComment],
     }))
     setDraft("")
-  }, [canComment, draft, nodeId, selectedNode])
+  }, [baseComments, canComment, draft, nodeId, selectedNode])
 
   return (
     <div className={cn("flex min-h-0 flex-1 flex-col", className)}>

@@ -2,7 +2,6 @@
 
 import * as React from "react"
 import { useRouter } from "next/navigation"
-import { Download, ExternalLink, MoreVertical, Share2, Star } from "lucide-react"
 
 import { Button } from "@/components/ui/button"
 import { Checkbox } from "@/components/ui/checkbox"
@@ -23,14 +22,26 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-  TableRowAction,
-  TableRowActions,
   TableSortHead,
 } from "@/components/ui/table"
-import { cn } from "@/lib/utils"
 import { mockDriveItems } from "@/features/drive/data/mock-files"
-import { FileTypeIcon } from "@/features/drive/components/file-type-icon/file-type-icon"
-import type { DriveItem, DriveSortDirection, DriveSortKey } from "@/features/drive/types"
+import { DriveDocumentNameCell } from "@/features/drive/components/drive-document-name-cell"
+import { DriveGridCardActions } from "@/features/drive/components/drive-grid-card-actions"
+import { DriveItemGrid } from "@/features/drive/components/drive-item-grid"
+import { DriveTableRowActions } from "@/features/drive/components/drive-table-row-actions"
+import type { DriveItemActionHandlers } from "@/features/drive/lib/drive-item-actions"
+import { buildPerspectiveViewHref } from "@/features/drive/lib/perspective-view-entry"
+import { explorerTableFilterColumns } from "@/features/drive/lib/explorer-table-columns"
+import {
+  filterItemsByColumns,
+  type ColumnFilterState,
+} from "@/features/drive/lib/table-column-filter"
+import type {
+  DriveItem,
+  DriveSortDirection,
+  DriveSortKey,
+} from "@/features/drive/types"
+import type { DriveViewMode } from "@/features/drive/types/view-mode"
 
 const ROWS_PER_PAGE = 10
 
@@ -64,26 +75,68 @@ function toggleSort(
 type FileExplorerTableProps = {
   /** When true, renders inside `FileExplorerPage` shell (no outer card). */
   embedded?: boolean
+  items?: DriveItem[]
   folderSearch?: string
+  columnFilters?: ColumnFilterState
   selectedId?: string
   onSelectedIdChange?: (id: string) => void
+  onItemFileInfo?: (item: DriveItem) => void
+  actionHandlers?: DriveItemActionHandlers
+  viewMode?: DriveViewMode
 }
 
 export function FileExplorerTable({
   embedded = false,
+  items: itemsProp,
   folderSearch = "",
+  columnFilters = {},
   selectedId: selectedIdProp,
   onSelectedIdChange,
+  onItemFileInfo,
+  actionHandlers,
+  viewMode = "list",
 }: FileExplorerTableProps) {
   const router = useRouter()
-  const [items] = React.useState(mockDriveItems)
-  const [selectedIdState, setSelectedIdState] = React.useState<string>("2")
+  const baseItems = itemsProp ?? mockDriveItems
+  const [selectedIdState, setSelectedIdState] = React.useState<string>(
+    () => baseItems[0]?.id ?? "1"
+  )
   const [selectedIds, setSelectedIds] = React.useState<Set<string>>(new Set())
+  const [starredOverrides, setStarredOverrides] = React.useState<
+    Record<string, boolean>
+  >({})
+  const [prevBaseItems, setPrevBaseItems] = React.useState(baseItems)
+  if (baseItems !== prevBaseItems) {
+    setPrevBaseItems(baseItems)
+    setStarredOverrides({})
+    setSelectedIdState(baseItems[0]?.id ?? "1")
+    setSelectedIds(new Set())
+  }
+  const items = React.useMemo(
+    () =>
+      baseItems.map((item) =>
+        starredOverrides[item.id] !== undefined
+          ? { ...item, starred: starredOverrides[item.id] }
+          : item
+      ),
+    [baseItems, starredOverrides]
+  )
   const [sortKey, setSortKey] = React.useState<DriveSortKey>("name")
   const [sortDirection, setSortDirection] =
     React.useState<DriveSortDirection>("asc")
   const [page, setPage] = React.useState(1)
   const [goToPage, setGoToPage] = React.useState("")
+  const paginationResetKey = JSON.stringify({
+    folderSearch,
+    columnFilters,
+    baseItems,
+  })
+  const [prevPaginationResetKey, setPrevPaginationResetKey] =
+    React.useState(paginationResetKey)
+  if (paginationResetKey !== prevPaginationResetKey) {
+    setPrevPaginationResetKey(paginationResetKey)
+    setPage(1)
+  }
   const selectedId = selectedIdProp ?? selectedIdState
 
   const setSelectedId = React.useCallback(
@@ -96,9 +149,20 @@ export function FileExplorerTable({
 
   const filtered = React.useMemo(() => {
     const term = folderSearch.trim().toLowerCase()
-    if (!term) return items
-    return items.filter((item) => item.name.toLowerCase().includes(term))
-  }, [items, folderSearch])
+    const searched = !term
+      ? items
+      : items.filter(
+          (item) =>
+            item.name.toLowerCase().includes(term) ||
+            item.category.toLowerCase().includes(term)
+        )
+
+    return filterItemsByColumns(
+      searched,
+      explorerTableFilterColumns,
+      columnFilters
+    )
+  }, [items, folderSearch, columnFilters])
 
   const sorted = React.useMemo(
     () =>
@@ -108,8 +172,7 @@ export function FileExplorerTable({
 
   const totalPages = Math.max(1, Math.ceil(sorted.length / ROWS_PER_PAGE))
   const safePage = Math.min(page, totalPages)
-  const pageStart =
-    sorted.length === 0 ? 0 : (safePage - 1) * ROWS_PER_PAGE + 1
+  const pageStart = sorted.length === 0 ? 0 : (safePage - 1) * ROWS_PER_PAGE + 1
   const pageEnd = Math.min(safePage * ROWS_PER_PAGE, sorted.length)
   const paginated = React.useMemo(() => {
     const start = (safePage - 1) * ROWS_PER_PAGE
@@ -145,211 +208,229 @@ export function FileExplorerTable({
     setGoToPage("")
   }
 
-  const table = (
+  const getItemActionHandlers = React.useCallback(
+    (item: DriveItem): DriveItemActionHandlers => ({
+      open: () => {
+        setSelectedId(item.id)
+      },
+      preview: (target) => {
+        router.push(buildPerspectiveViewHref(target))
+      },
+      "open-perspective": (target) => {
+        router.push(buildPerspectiveViewHref(target))
+      },
+      "file-info": (target) => {
+        setSelectedId(target.id)
+        onItemFileInfo?.(target)
+      },
+      share: (target) => {
+        actionHandlers?.share?.(target)
+      },
+      download: (target) => {
+        actionHandlers?.download?.(target)
+      },
+      ...actionHandlers,
+      star: (target) => {
+        setStarredOverrides((current) => ({
+          ...current,
+          [target.id]: !(current[target.id] ?? Boolean(target.starred)),
+        }))
+        actionHandlers?.star?.(target)
+      },
+    }),
+    [actionHandlers, onItemFileInfo, router, setSelectedId]
+  )
+
+  const paginationFooter = (
+    <TableFooterBar className="mt-auto shrink-0 border-t border-border/60 bg-background px-4 py-2.5">
+      <p className="text-sm text-muted-foreground">
+        Showing {pageStart}-{pageEnd} of {sorted.length}
+      </p>
+      <div className="flex flex-wrap items-center gap-2 sm:justify-end">
+        <Pagination className="mx-0 w-auto">
+          <PaginationContent>
+            <PaginationItem>
+              <PaginationPrevious
+                href="#"
+                onClick={(event) => {
+                  event.preventDefault()
+                  setPage((current) => Math.max(current - 1, 1))
+                }}
+                aria-disabled={safePage === 1}
+                className={
+                  safePage === 1 ? "pointer-events-none opacity-50" : ""
+                }
+              />
+            </PaginationItem>
+            <PaginationItem>
+              <span className="px-2 text-sm text-muted-foreground">
+                {safePage} of {totalPages}
+              </span>
+            </PaginationItem>
+            <PaginationItem>
+              <PaginationNext
+                href="#"
+                onClick={(event) => {
+                  event.preventDefault()
+                  setPage((current) => Math.min(current + 1, totalPages))
+                }}
+                aria-disabled={safePage === totalPages}
+                className={
+                  safePage === totalPages
+                    ? "pointer-events-none opacity-50"
+                    : ""
+                }
+              />
+            </PaginationItem>
+          </PaginationContent>
+        </Pagination>
+        <div className="flex items-center gap-2">
+          <span className="text-sm text-muted-foreground">Go to page</span>
+          <Input
+            type="number"
+            min={1}
+            max={totalPages}
+            value={goToPage}
+            onChange={(event) => setGoToPage(event.target.value)}
+            onKeyDown={(event) => {
+              if (event.key === "Enter") handleGoToPage()
+            }}
+            className="h-9 w-16 px-2 text-center"
+            aria-label="Go to page number"
+          />
+          <Button
+            type="button"
+            size="sm"
+            className="primary-button h-9 px-4"
+            onClick={handleGoToPage}
+          >
+            Go
+          </Button>
+        </div>
+      </div>
+    </TableFooterBar>
+  )
+
+  const gridView = (
     <>
       <div className="min-h-0 w-full max-w-full flex-1 overflow-auto">
-      <Table className="min-w-[960px] w-full">
-        <TableHeader>
-          <TableRow className="hover:bg-transparent">
-            <TableHead className="w-12">
-              <Checkbox
-                checked={allOnPageSelected}
-                onCheckedChange={(value) => handleSelectAll(value === true)}
-                aria-label="Select all on page"
-              />
-            </TableHead>
-            <TableSortHead
-              className="min-w-[200px]"
-              sortDirection={sortKey === "name" ? sortDirection : false}
-              onSort={() => handleSort("name")}
-            >
-              Name
-            </TableSortHead>
-            <TableHead className="w-[17%]">Category</TableHead>
-            <TableHead className="w-[12%]">Workspace</TableHead>
-            <TableSortHead
-              className="w-[20%]"
-              sortDirection={sortKey === "createdAt" ? sortDirection : false}
-              onSort={() => handleSort("createdAt")}
-            >
-              Created Date
-            </TableSortHead>
-            <TableHead className="w-[10%]">File Size</TableHead>
-            <TableHead className="w-[188px] text-right">Actions</TableHead>
-          </TableRow>
-        </TableHeader>
-        <TableBody>
-          {paginated.map((item) => {
-            const isSelected = selectedId === item.id
-            const isChecked = selectedIds.has(item.id)
-            return (
-              <TableRow
-                key={item.id}
-                data-state={isSelected ? "selected" : undefined}
-                className="h-11 cursor-pointer"
-                onClick={() => setSelectedId(item.id)}
-              >
-                <TableCell
-                  className="py-2"
-                  onClick={(event) => event.stopPropagation()}
-                >
-                  <Checkbox
-                    checked={isChecked}
-                    onCheckedChange={(value) => {
-                      setSelectedIds((prev) => {
-                        const next = new Set(prev)
-                        if (value === true) next.add(item.id)
-                        else next.delete(item.id)
-                        return next
-                      })
-                    }}
-                    aria-label={`Select ${item.name}`}
-                  />
-                </TableCell>
-                <TableCell className="py-2">
-                  <div className="flex items-center gap-2.5">
-                    <FileTypeIcon
-                      name={item.name}
-                      explicitType={item.type}
-                      variant="compact"
-                      size="md"
-                    />
-                    <span className="font-medium text-foreground">{item.name}</span>
-                  </div>
-                </TableCell>
-                <TableCell className="py-2 text-muted-foreground">
-                  {item.category}
-                </TableCell>
-                <TableCell className="py-2 text-muted-foreground">
-                  {item.workspace}
-                </TableCell>
-                <TableCell className="py-2 text-muted-foreground">
-                  {item.createdAt}
-                </TableCell>
-                <TableCell className="py-2 text-muted-foreground">
-                  {item.fileSize ?? "--"}
-                </TableCell>
-                <TableCell
-                  className="py-2 text-right"
-                  onClick={(event) => event.stopPropagation()}
-                >
-                  <TableRowActions>
-                    <TableRowAction
-                      type="button"
-                      aria-label={item.starred ? "Unstar" : "Star"}
-                    >
-                      <Star
-                        className={cn(
-                          "size-4",
-                          item.starred
-                            ? "fill-amber-400 text-amber-400"
-                            : "opacity-70"
-                        )}
-                      />
-                    </TableRowAction>
-                    <TableRowAction type="button" aria-label="Share">
-                      <Share2 className="size-4" />
-                    </TableRowAction>
-                    <TableRowAction type="button" aria-label="Download">
-                      <Download className="size-4" />
-                    </TableRowAction>
-                    <TableRowAction
-                      type="button"
-                      aria-label="Open in perspective view"
-                      onClick={() =>
-                        router.push(`/perspective-view?id=${item.id}`)
-                      }
-                    >
-                      <ExternalLink className="size-4" />
-                    </TableRowAction>
-                    <TableRowAction
-                      type="button"
-                      visibility="always"
-                      aria-label="More actions"
-                    >
-                      <MoreVertical className="size-4" />
-                    </TableRowAction>
-                  </TableRowActions>
-                </TableCell>
-              </TableRow>
-            )
-          })}
-        </TableBody>
-      </Table>
-      </div>
-      <TableFooterBar className="mt-auto shrink-0 border-t border-border/60 bg-background px-4 py-2.5">
-        <p className="text-sm text-muted-foreground">
-          Showing {pageStart}-{pageEnd} of {sorted.length}
-        </p>
-        <div className="flex flex-wrap items-center gap-2 sm:justify-end">
-          <Pagination className="mx-0 w-auto">
-            <PaginationContent>
-              <PaginationItem>
-                <PaginationPrevious
-                  href="#"
-                  onClick={(event) => {
-                    event.preventDefault()
-                    setPage((current) => Math.max(current - 1, 1))
-                  }}
-                  aria-disabled={safePage === 1}
-                  className={safePage === 1 ? "pointer-events-none opacity-50" : ""}
-                />
-              </PaginationItem>
-              <PaginationItem>
-                <span className="px-2 text-sm text-muted-foreground">
-                  {safePage} of {totalPages}
-                </span>
-              </PaginationItem>
-              <PaginationItem>
-                <PaginationNext
-                  href="#"
-                  onClick={(event) => {
-                    event.preventDefault()
-                    setPage((current) => Math.min(current + 1, totalPages))
-                  }}
-                  aria-disabled={safePage === totalPages}
-                  className={
-                    safePage === totalPages ? "pointer-events-none opacity-50" : ""
-                  }
-                />
-              </PaginationItem>
-            </PaginationContent>
-          </Pagination>
-          <div className="flex items-center gap-2">
-            <span className="text-sm text-muted-foreground">Go to page</span>
-            <Input
-              type="number"
-              min={1}
-              max={totalPages}
-              value={goToPage}
-              onChange={(event) => setGoToPage(event.target.value)}
-              onKeyDown={(event) => {
-                if (event.key === "Enter") handleGoToPage()
-              }}
-              className="h-9 w-16 px-2 text-center"
-              aria-label="Go to page number"
+        <DriveItemGrid
+          items={paginated}
+          selectedId={selectedId}
+          onSelectedIdChange={setSelectedId}
+          selectedIds={selectedIds}
+          onSelectedIdsChange={setSelectedIds}
+          renderActions={(item) => (
+            <DriveGridCardActions
+              item={item}
+              handlers={getItemActionHandlers(item)}
             />
-            <Button
-              type="button"
-              size="sm"
-              className="primary-button h-9 px-4"
-              onClick={handleGoToPage}
-            >
-              Go
-            </Button>
-          </div>
-        </div>
-      </TableFooterBar>
+          )}
+        />
+      </div>
+      {paginationFooter}
     </>
   )
 
-  if (embedded) {
-    return (
-      <div className="flex min-h-0 w-full max-w-full flex-1 flex-col overflow-hidden">
-        {table}
+  const table = (
+    <>
+      <div className="min-h-0 w-full max-w-full flex-1 overflow-auto">
+        <Table className="w-full min-w-[960px]">
+          <TableHeader>
+            <TableRow className="hover:bg-transparent">
+              <TableHead className="pl-6">
+                <div className="flex items-center">
+                  <Checkbox
+                    checked={allOnPageSelected}
+                    onCheckedChange={(value) => handleSelectAll(value === true)}
+                    aria-label="Select all on page"
+                  />
+                </div>
+              </TableHead>
+              <TableSortHead
+                className="min-w-[200px]"
+                sortDirection={sortKey === "name" ? sortDirection : false}
+                onSort={() => handleSort("name")}
+              >
+                Name
+              </TableSortHead>
+              <TableHead className="w-[17%]">Category</TableHead>
+
+              <TableSortHead
+                className="w-[20%]"
+                sortDirection={sortKey === "createdAt" ? sortDirection : false}
+                onSort={() => handleSort("createdAt")}
+              >
+                Created Date
+              </TableSortHead>
+              <TableHead className="w-[10%]">File Size</TableHead>
+              <TableHead className="w-[188px] text-right">Actions</TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {paginated.map((item) => {
+              const isSelected = selectedId === item.id
+              const isChecked = selectedIds.has(item.id)
+              return (
+                <TableRow
+                  key={item.id}
+                  data-state={isSelected ? "selected" : undefined}
+                  className="h-11 cursor-pointer"
+                  onClick={() => setSelectedId(item.id)}
+                >
+                  <TableCell
+                    className="pl-6"
+                    onClick={(event) => event.stopPropagation()}
+                  >
+                    <div className="flex items-center">
+                      <Checkbox
+                        checked={isChecked}
+                        onCheckedChange={(value) => {
+                          setSelectedIds((prev) => {
+                            const next = new Set(prev)
+                            if (value === true) next.add(item.id)
+                            else next.delete(item.id)
+                            return next
+                          })
+                        }}
+                        aria-label={`Select ${item.name}`}
+                      />
+                    </div>
+                  </TableCell>
+                  <TableCell className="py-2">
+                    <DriveDocumentNameCell item={item} />
+                  </TableCell>
+                  <TableCell className="py-2 text-muted-foreground">
+                    {item.category}
+                  </TableCell>
+
+                  <TableCell className="py-2 text-muted-foreground">
+                    {item.createdAt}
+                  </TableCell>
+                  <TableCell className="py-2 text-muted-foreground">
+                    {item.fileSize ?? "--"}
+                  </TableCell>
+                  <TableCell className="py-2 text-right">
+                    <DriveTableRowActions
+                      item={item}
+                      handlers={getItemActionHandlers(item)}
+                    />
+                  </TableCell>
+                </TableRow>
+              )
+            })}
+          </TableBody>
+        </Table>
       </div>
-    )
+      {paginationFooter}
+    </>
+  )
+
+  const content = viewMode === "grid" ? gridView : table
+
+  if (embedded) {
+    return <TableContainer variant="flat">{content}</TableContainer>
   }
 
-  return <TableContainer>{table}</TableContainer>
+  return <TableContainer>{content}</TableContainer>
 }

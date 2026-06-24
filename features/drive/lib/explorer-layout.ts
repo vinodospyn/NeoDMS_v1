@@ -21,7 +21,7 @@ export const explorerFolderRowSelectedClass =
   "bg-sky-50/90 text-foreground dark:bg-sky-950/35 dark:text-foreground"
 
 export const explorerFolderToggleClass =
-  "size-8 shrink-0 rounded-md border border-transparent bg-(--drive-search-bg) text-primary hover:bg-[#e8ecf1]"
+  "drive-explorer-folder-toggle size-9 shrink-0 rounded-[10px] border text-primary shadow-none transition-[filter] hover:brightness-[0.98]"
 
 export function getExplorerGridTemplateColumns(
   myFoldersOpen: boolean,

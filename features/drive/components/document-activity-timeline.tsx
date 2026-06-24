@@ -90,7 +90,7 @@ export function DocumentActivityTimeline({
 
   return (
     <Timeline className={className}>
-      {events.map((event, index) => (
+      {events.map((event) => (
         <TimelineItem key={event.id}>
           <TimelineMarker>
             <Avatar size="sm" className="size-8">
