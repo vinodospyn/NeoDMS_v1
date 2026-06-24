@@ -35,6 +35,9 @@ const crumbLinkClass =
   "text-[13px] font-medium text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200"
 
 type FileExplorerBreadcrumbProps = {
+  rootLabel?: string
+  rootHref?: string
+  pathCrumbs?: ReadonlyArray<{ label: string; href?: string }>
   activeFolderLabel: string
   onNewFolder?: () => void
   onRename?: () => void
@@ -45,6 +48,9 @@ type FileExplorerBreadcrumbProps = {
 }
 
 export function FileExplorerBreadcrumb({
+  rootLabel = "Personal Space",
+  rootHref = "#",
+  pathCrumbs = PATH_CRUMBS,
   activeFolderLabel,
   onNewFolder,
   onRename,
@@ -58,15 +64,15 @@ export function FileExplorerBreadcrumb({
       <BreadcrumbList className="flex-nowrap gap-1.5 overflow-hidden">
         <BreadcrumbItem className="shrink-0">
           <BreadcrumbLink
-            href="#"
+            href={rootHref}
             className={cn(crumbLinkClass, "inline-flex items-center gap-1.5")}
           >
             <Home className="size-3.5 shrink-0 opacity-80" aria-hidden />
-            <span>Personal Space</span>
+            <span>{rootLabel}</span>
           </BreadcrumbLink>
         </BreadcrumbItem>
 
-        {PATH_CRUMBS.map((crumb) => (
+        {pathCrumbs.map((crumb) => (
           <React.Fragment key={crumb.label}>
             <BreadcrumbSeparator className="shrink-0 text-slate-300 dark:text-slate-600" />
             <BreadcrumbItem className="hidden shrink-0 sm:inline-flex">

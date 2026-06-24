@@ -9,11 +9,6 @@ import { appConfig } from "@/config/app"
 import { getSidebarNavItems } from "@/config/nav/resolver"
 import { sidebarSettingsNavItem } from "@/config/nav/sidebar-nav"
 import type { NavItem } from "@/config/nav/types"
-import {
-  Collapsible,
-  CollapsibleContent,
-  CollapsibleTrigger,
-} from "@/components/ui/collapsible"
 import { Progress } from "@/components/ui/progress"
 import {
   Sidebar,
@@ -34,6 +29,12 @@ import {
 import { cn } from "@/lib/utils"
 import { isNavGroupActive, isNavItemActive } from "@/lib/navigation"
 import { DriveNewMenu } from "@/features/drive/components/drive-new-menu"
+import { WorkspaceSidebarNavGroup } from "@/components/layout/workspace-sidebar-nav-group"
+import {
+  Collapsible,
+  CollapsibleContent,
+  CollapsibleTrigger,
+} from "@/components/ui/collapsible"
 
 const storagePercent =
   (appConfig.storageUsedGb / appConfig.storageTotalGb) * 100
@@ -57,7 +58,9 @@ function SidebarNavLink({
     <SidebarMenuItem>
       <SidebarMenuButton
         asChild
-        isActive={isNavItemActive(pathname, item.href)}
+        isActive={isNavItemActive(pathname, item.href, {
+          matchDescendants: item.matchDescendants,
+        })}
         tooltip={item.label}
         className={menuButtonClassName}
       >
@@ -90,7 +93,10 @@ function SidebarNavGroup({
   const [userOpen, setUserOpen] = React.useState<boolean | undefined>(undefined)
   const open = userOpen ?? isGroupActive
 
-  if (!item.children?.length) {
+  if (!item.children?.length || item.expandOnly) {
+    if (item.expandOnly) {
+      return null
+    }
     return <SidebarNavLink item={item} pathname={pathname} router={router} />
   }
 
@@ -121,7 +127,9 @@ function SidebarNavGroup({
               <SidebarMenuSubItem key={child.href}>
                 <SidebarMenuSubButton
                   asChild
-                  isActive={isNavItemActive(pathname, child.href)}
+                  isActive={isNavItemActive(pathname, child.href, {
+                    matchDescendants: child.matchDescendants,
+                  })}
                 >
                   <Link
                     href={child.href}
@@ -181,7 +189,16 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         <SidebarGroup className="py-0">
           <SidebarGroupContent>
             <SidebarMenu className="gap-0.5">
-              {navItems.map((item) => (
+              {navItems.slice(0, 2).map((item) => (
+                <SidebarNavGroup
+                  key={`${item.label}-${isNavGroupActive(pathname, item)}`}
+                  item={item}
+                  pathname={pathname}
+                  router={router}
+                />
+              ))}
+              <WorkspaceSidebarNavGroup pathname={pathname} router={router} />
+              {navItems.slice(2).map((item) => (
                 <SidebarNavGroup
                   key={`${item.label}-${isNavGroupActive(pathname, item)}`}
                   item={item}
@@ -198,21 +215,11 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         <SidebarSeparator className="mx-0 w-full" />
         <div className="flex flex-col gap-3 px-3 py-4 group-data-[collapsible=icon]:px-2">
           <SidebarMenu className="gap-0.5">
-            <SidebarMenuItem>
-              <SidebarMenuButton
-                asChild
-                isActive={isNavItemActive(pathname, sidebarSettingsNavItem.href)}
-                tooltip={sidebarSettingsNavItem.label}
-                className={menuButtonClassName}
-              >
-                <Link href={sidebarSettingsNavItem.href} prefetch>
-                  {sidebarSettingsNavItem.icon ? (
-                    <sidebarSettingsNavItem.icon className="size-[18px]" />
-                  ) : null}
-                  <span>{sidebarSettingsNavItem.label}</span>
-                </Link>
-              </SidebarMenuButton>
-            </SidebarMenuItem>
+            <SidebarNavLink
+              item={sidebarSettingsNavItem}
+              pathname={pathname}
+              router={router}
+            />
           </SidebarMenu>
 
           <div className="rounded-xl border border-sidebar-border bg-sidebar-accent/30 p-3 group-data-[collapsible=icon]:hidden">

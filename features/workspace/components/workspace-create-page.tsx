@@ -6,6 +6,7 @@ import { toast } from "sonner"
 
 import { WorkspaceForm } from "@/features/workspace/components/workspace-form"
 import { useCreateWorkspace } from "@/features/workspace/hooks/use-create-workspace"
+import { workspaceSettingsRoutes } from "@/features/workspace/lib/routes"
 import { WorkspaceApiError } from "@/features/workspace/services/workspace-errors"
 import { getErrorMessage } from "@/features/workspace/services/workspace-errors"
 
@@ -25,7 +26,7 @@ export function WorkspaceCreatePage() {
       {
         onSuccess: () => {
           toast.success("Workspace created")
-          router.push("/workspaces")
+          router.push(workspaceSettingsRoutes.list)
         },
         onError: (error) => {
           if (
@@ -48,7 +49,7 @@ export function WorkspaceCreatePage() {
         mode="create"
         onSubmit={handleSubmit}
         isSubmitting={createMutation.isPending}
-        onCancel={() => router.push("/workspaces")}
+        onCancel={() => router.push(workspaceSettingsRoutes.list)}
         serverError={serverError}
       />
     </div>

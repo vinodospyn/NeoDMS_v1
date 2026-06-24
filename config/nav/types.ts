@@ -4,6 +4,7 @@ export type NavSubItem = {
   label: string
   href: string
   icon?: LucideIcon
+  matchDescendants?: boolean
 }
 
 export type NavItem = {
@@ -11,4 +12,7 @@ export type NavItem = {
   href: string
   icon?: LucideIcon
   children?: NavSubItem[]
+  matchDescendants?: boolean
+  /** When true, parent only expands/collapses — it does not navigate. */
+  expandOnly?: boolean
 }

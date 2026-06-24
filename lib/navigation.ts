@@ -1,15 +1,33 @@
-import type { NavItem } from "@/config/nav/types"
+import type { NavItem, NavSubItem } from "@/config/nav/types"
 
-export function isNavItemActive(pathname: string, href: string): boolean {
+type NavMatchOptions = Pick<NavSubItem, "matchDescendants">
+
+export function isNavItemActive(
+  pathname: string,
+  href: string,
+  options?: NavMatchOptions
+): boolean {
   if (href === "/") return pathname === href
-  // For sidebar items we want a single, precise active state, so only match
-  // when the pathname exactly equals the item's href.
+  if (options?.matchDescendants) {
+    return pathname === href || pathname.startsWith(`${href}/`)
+  }
   return pathname === href
 }
 
 export function isNavGroupActive(pathname: string, item: NavItem): boolean {
   if (item.children?.length) {
-    return item.children.some((child) => isNavItemActive(pathname, child.href))
+    return (
+      isNavItemActive(pathname, item.href, {
+        matchDescendants: item.matchDescendants,
+      }) ||
+      item.children.some((child) =>
+        isNavItemActive(pathname, child.href, {
+          matchDescendants: child.matchDescendants,
+        })
+      )
+    )
   }
-  return isNavItemActive(pathname, item.href)
+  return isNavItemActive(pathname, item.href, {
+    matchDescendants: item.matchDescendants,
+  })
 }
