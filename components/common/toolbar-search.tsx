@@ -37,14 +37,14 @@ export function ToolbarSearch({
 }: ToolbarSearchProps) {
   const [focused, setFocused] = React.useState(false)
   const [localValue, setLocalValue] = React.useState(value)
+  const [prevValue, setPrevValue] = React.useState(value)
   const debounceRef = React.useRef<ReturnType<typeof setTimeout> | null>(null)
   const isDebounced = debounceMs != null && debounceMs > 0
 
-  React.useEffect(() => {
-    if (isDebounced) {
-      setLocalValue(value)
-    }
-  }, [isDebounced, value])
+  if (isDebounced && value !== prevValue) {
+    setPrevValue(value)
+    setLocalValue(value)
+  }
 
   React.useEffect(() => {
     return () => {

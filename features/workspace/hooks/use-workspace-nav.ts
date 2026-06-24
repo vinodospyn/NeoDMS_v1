@@ -30,7 +30,7 @@ export function useWorkspaceNavItems(): {
       }))
     }
     return mockWorkspaceNavEntries
-  }, [data?.items, isError])
+  }, [data, isError])
 
   return { items, isLoading }
 }

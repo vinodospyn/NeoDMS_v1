@@ -97,30 +97,47 @@ export function FileExplorerTable({
   viewMode = "list",
 }: FileExplorerTableProps) {
   const router = useRouter()
-  const [items, setItems] = React.useState(itemsProp ?? mockDriveItems)
+  const baseItems = itemsProp ?? mockDriveItems
   const [selectedIdState, setSelectedIdState] = React.useState<string>(
-    () => (itemsProp ?? mockDriveItems)[0]?.id ?? "1"
+    () => baseItems[0]?.id ?? "1"
   )
   const [selectedIds, setSelectedIds] = React.useState<Set<string>>(new Set())
+  const [starredOverrides, setStarredOverrides] = React.useState<
+    Record<string, boolean>
+  >({})
+  const [prevBaseItems, setPrevBaseItems] = React.useState(baseItems)
+  if (baseItems !== prevBaseItems) {
+    setPrevBaseItems(baseItems)
+    setStarredOverrides({})
+    setSelectedIdState(baseItems[0]?.id ?? "1")
+    setSelectedIds(new Set())
+  }
+  const items = React.useMemo(
+    () =>
+      baseItems.map((item) =>
+        starredOverrides[item.id] !== undefined
+          ? { ...item, starred: starredOverrides[item.id] }
+          : item
+      ),
+    [baseItems, starredOverrides]
+  )
   const [sortKey, setSortKey] = React.useState<DriveSortKey>("name")
   const [sortDirection, setSortDirection] =
     React.useState<DriveSortDirection>("asc")
   const [page, setPage] = React.useState(1)
   const [goToPage, setGoToPage] = React.useState("")
-  const selectedId = selectedIdProp ?? selectedIdState
-
-  React.useEffect(() => {
-    if (itemsProp) {
-      setItems(itemsProp)
-      setSelectedIdState(itemsProp[0]?.id ?? "1")
-      setSelectedIds(new Set())
-      setPage(1)
-    }
-  }, [itemsProp])
-
-  React.useEffect(() => {
+  const paginationResetKey = JSON.stringify({
+    folderSearch,
+    columnFilters,
+    baseItems,
+  })
+  const [prevPaginationResetKey, setPrevPaginationResetKey] =
+    React.useState(paginationResetKey)
+  if (paginationResetKey !== prevPaginationResetKey) {
+    setPrevPaginationResetKey(paginationResetKey)
     setPage(1)
-  }, [folderSearch, columnFilters])
+  }
+  const selectedId = selectedIdProp ?? selectedIdState
 
   const setSelectedId = React.useCallback(
     (id: string) => {
@@ -214,13 +231,10 @@ export function FileExplorerTable({
       },
       ...actionHandlers,
       star: (target) => {
-        setItems((current) =>
-          current.map((entry) =>
-            entry.id === target.id
-              ? { ...entry, starred: !entry.starred }
-              : entry
-          )
-        )
+        setStarredOverrides((current) => ({
+          ...current,
+          [target.id]: !(current[target.id] ?? Boolean(target.starred)),
+        }))
         actionHandlers?.star?.(target)
       },
     }),
