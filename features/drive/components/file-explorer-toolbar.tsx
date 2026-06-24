@@ -6,45 +6,58 @@ import {
   Grid3x3,
   Info,
   List,
-  Plus,
-  Search,
-  SlidersHorizontal,
 } from "lucide-react"
 
+import { TableColumnFilter } from "@/components/common/table-column-filter"
+import { ToolbarSearch } from "@/components/common/toolbar-search"
 import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
 import { cn } from "@/lib/utils"
 import { FolderTreeToggleIcon } from "@/features/drive/components/folder-tree-toggle-icon"
 import { explorerFolderToggleClass } from "@/features/drive/lib/explorer-layout"
-
-type ExplorerViewMode = "list" | "grid"
+import {
+  DRIVE_GRID_GAP,
+  driveExplorerChromeRowClass,
+} from "@/features/drive/lib/drive-grid-layout"
+import type {
+  ColumnFilterSection,
+  ColumnFilterState,
+} from "@/features/drive/lib/table-column-filter"
+import type { DriveViewMode } from "@/features/drive/types/view-mode"
 
 type FileExplorerToolbarProps = {
   folderSearch: string
   onFolderSearchChange: (value: string) => void
+  filterSections: ColumnFilterSection[]
+  columnFilters: ColumnFilterState
+  onColumnFiltersChange: (filters: ColumnFilterState) => void
   myFoldersOpen: boolean
   onToggleMyFolders: () => void
   certificationOpen: boolean
   onToggleCertification: () => void
+  viewMode: DriveViewMode
+  onViewModeChange: (mode: DriveViewMode) => void
 }
 
 function ToolbarDivider() {
-  return <span className="mx-1 h-5 w-px shrink-0 bg-border/80" aria-hidden />
+  return <span className="mx-2 h-5 w-px shrink-0 bg-border/80" aria-hidden />
 }
 
 export function FileExplorerToolbar({
   folderSearch,
   onFolderSearchChange,
+  filterSections,
+  columnFilters,
+  onColumnFiltersChange,
   myFoldersOpen,
   onToggleMyFolders,
   certificationOpen,
   onToggleCertification,
+  viewMode,
+  onViewModeChange,
 }: FileExplorerToolbarProps) {
-  const [viewMode, setViewMode] = React.useState<ExplorerViewMode>("list")
-
   return (
-    <div className="flex shrink-0 items-center justify-between gap-2 border-b border-border/60 bg-background px-3 py-2.5">
-      <div className="flex items-center gap-2">
+    <div className={cn(driveExplorerChromeRowClass, "justify-between")}>
+      <div className={cn("flex min-w-0 items-center", DRIVE_GRID_GAP)}>
         <Button
           type="button"
           variant="ghost"
@@ -61,30 +74,14 @@ export function FileExplorerToolbar({
           <FolderTreeToggleIcon />
         </Button>
 
-        <div className="relative w-full flex-1">
-          <Search
-            className="pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2 text-muted-foreground"
-            aria-hidden
-          />
-          <Input
-            type="search"
-            value={folderSearch}
-            onChange={(event) => onFolderSearchChange(event.target.value)}
-            placeholder="Search in selected folder"
-            className="h-9 rounded-lg border-border/70 pr-11 pl-9 shadow-none"
-          />
-          <Button
-            type="button"
-            variant="ghost"
-            size="icon-sm"
-            className="absolute top-1/2 right-1 size-7 -translate-y-1/2 rounded-md bg-(--drive-search-bg) text-primary hover:bg-[#dce8f5]"
-            aria-label="Search folder"
-          >
-            <Search className="size-3.5" strokeWidth={2.25} aria-hidden />
-          </Button>
-        </div>
+        <ToolbarSearch
+          value={folderSearch}
+          onChange={onFolderSearchChange}
+          placeholder="Search in selected folder"
+          aria-label="Search in selected folder"
+        />
       </div>
-      <div className="flex items-center gap-2">
+      <div className={cn("flex shrink-0 items-center", DRIVE_GRID_GAP)}>
         <div
           className="flex shrink-0 items-center rounded-lg border border-border/60 bg-muted/25 p-0.5"
           role="group"
@@ -102,7 +99,7 @@ export function FileExplorerToolbar({
             )}
             aria-label="List view"
             aria-pressed={viewMode === "list"}
-            onClick={() => setViewMode("list")}
+            onClick={() => onViewModeChange("list")}
           >
             <List className="size-4" />
           </Button>
@@ -118,20 +115,11 @@ export function FileExplorerToolbar({
             )}
             aria-label="Grid view"
             aria-pressed={viewMode === "grid"}
-            onClick={() => setViewMode("grid")}
+            onClick={() => onViewModeChange("grid")}
           >
             <Grid3x3 className="size-4" />
           </Button>
         </div>
-
-        <Button
-          type="button"
-          size="sm"
-          className="primary-button h-9 shrink-0 gap-1.5 px-4"
-        >
-          <Plus className="size-4" />
-          New
-        </Button>
 
         <div className="flex shrink-0 items-center">
           <ToolbarDivider />
@@ -145,15 +133,11 @@ export function FileExplorerToolbar({
             <ArrowDownUp className="size-4" />
           </Button>
           <ToolbarDivider />
-          <Button
-            type="button"
-            variant="ghost"
-            size="icon-sm"
-            className="size-8 text-muted-foreground hover:text-foreground"
-            aria-label="Filter"
-          >
-            <SlidersHorizontal className="size-4" />
-          </Button>
+          <TableColumnFilter
+            sections={filterSections}
+            filters={columnFilters}
+            onFiltersChange={onColumnFiltersChange}
+          />
           <ToolbarDivider />
           <Button
             type="button"
@@ -166,9 +150,7 @@ export function FileExplorerToolbar({
                 : "text-muted-foreground hover:text-foreground"
             )}
             aria-label={
-              certificationOpen
-                ? "Close certificates panel"
-                : "Open certificates panel"
+              certificationOpen ? "Close quick view" : "Open quick view"
             }
             aria-pressed={certificationOpen}
             aria-expanded={certificationOpen}

@@ -1,30 +1,31 @@
 import type { NavItem } from "@/config/nav/types"
 import {
   Clock3,
-  FileText,
-  LayoutDashboard,
-  Share2,
+  HardDrive,
+  Home,
+  Send,
+  Settings,
   Star,
   Trash2,
-  Settings,
   Users,
 } from "lucide-react"
 
-/** Primary drive navigation (matches DMS dashboard design). */
+/** Collapsible workspaces group — children loaded dynamically from Workspace Management. */
+export const workspacesSidebarNavItem: NavItem = {
+  label: "Workspaces",
+  href: "/workspaces",
+  icon: HardDrive,
+  expandOnly: true,
+  matchDescendants: true,
+}
+
+/** Primary drive navigation (matches DMS sidebar design). */
 export const sidebarNavItems: NavItem[] = [
-  { label: "Dashboard", href: "/", icon: LayoutDashboard },
-  { label: "Owned by me", href: "/owned-by-me", icon: FileText },
-  {
-    label: "Shared with me",
-    href: "/shared-with-me",
-    icon: Users,
-  },
-  { label: "Shared by me", href: "/shared-by-me", icon: Share2 },
-  {
-    label: "Quick access",
-    href: "/quick-access",
-    icon: Star,
-  },
+  { label: "Home", href: "/", icon: Home },
+  { label: "Personal Space", href: "/personal-space", icon: HardDrive },
+  { label: "Shared with me", href: "/shared-with-me", icon: Users },
+  { label: "Shared by me", href: "/shared-by-me", icon: Send },
+  { label: "Favorites", href: "/favorites", icon: Star },
   { label: "Recent", href: "/recent", icon: Clock3 },
   { label: "Trash", href: "/trash", icon: Trash2 },
 ]
@@ -34,4 +35,17 @@ export const sidebarSettingsNavItem: NavItem = {
   label: "Settings",
   href: "/settings",
   icon: Settings,
+  matchDescendants: true,
+}
+
+export function flattenSidebarNavItems(items: NavItem[]): NavItem[] {
+  return items.flatMap((item) =>
+    item.children?.length
+      ? item.children.map((child) => ({
+          label: child.label,
+          href: child.href,
+          icon: child.icon,
+        }))
+      : [item]
+  )
 }

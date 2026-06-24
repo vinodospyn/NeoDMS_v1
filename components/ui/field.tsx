@@ -52,7 +52,7 @@ function FieldGroup({ className, ...props }: React.ComponentProps<"div">) {
 }
 
 const fieldVariants = cva(
-  "group/field flex w-full gap-2 data-[invalid=true]:text-destructive",
+  "group/field flex w-full data-[invalid=true]:text-destructive",
   {
     variants: {
       orientation: {
@@ -62,9 +62,29 @@ const fieldVariants = cva(
         responsive:
           "flex-col *:w-full @md/field-group:flex-row @md/field-group:items-center @md/field-group:*:w-auto @md/field-group:has-[>[data-slot=field-content]]:items-start @md/field-group:*:data-[slot=field-label]:flex-auto [&>.sr-only]:w-auto @md/field-group:has-[>[data-slot=field-content]]:[&>[role=checkbox],[role=radio]]:mt-px",
       },
+      density: {
+        default: "gap-2",
+        form: "gap-1.5",
+      },
     },
     defaultVariants: {
       orientation: "vertical",
+      density: "default",
+    },
+  }
+)
+
+const fieldLabelVariants = cva(
+  "group/field-label peer/field-label flex w-fit gap-2 leading-snug group-data-[disabled=true]/field:opacity-50 has-data-checked:border-primary/30 has-data-checked:bg-primary/5 has-[>[data-slot=field]]:rounded-lg has-[>[data-slot=field]]:border *:data-[slot=field]:p-2.5 dark:has-data-checked:border-primary/20 dark:has-data-checked:bg-primary/10 has-[>[data-slot=field]]:w-full has-[>[data-slot=field]]:flex-col",
+  {
+    variants: {
+      size: {
+        default: "",
+        form: "text-xs font-medium",
+      },
+    },
+    defaultVariants: {
+      size: "default",
     },
   }
 )
@@ -72,6 +92,7 @@ const fieldVariants = cva(
 function Field({
   className,
   orientation = "vertical",
+  density = "default",
   ...props
 }: React.ComponentProps<"div"> & VariantProps<typeof fieldVariants>) {
   return (
@@ -79,7 +100,18 @@ function Field({
       role="group"
       data-slot="field"
       data-orientation={orientation}
-      className={cn(fieldVariants({ orientation }), className)}
+      data-density={density}
+      className={cn(fieldVariants({ orientation, density }), className)}
+      {...props}
+    />
+  )
+}
+
+function FormFieldGroup({ className, ...props }: React.ComponentProps<"div">) {
+  return (
+    <div
+      data-slot="form-field-group"
+      className={cn("flex w-full flex-col space-y-3", className)}
       {...props}
     />
   )
@@ -100,16 +132,14 @@ function FieldContent({ className, ...props }: React.ComponentProps<"div">) {
 
 function FieldLabel({
   className,
+  size = "default",
   ...props
-}: React.ComponentProps<typeof Label>) {
+}: React.ComponentProps<typeof Label> & VariantProps<typeof fieldLabelVariants>) {
   return (
     <Label
       data-slot="field-label"
-      className={cn(
-        "group/field-label peer/field-label flex w-fit gap-2 leading-snug group-data-[disabled=true]/field:opacity-50 has-data-checked:border-primary/30 has-data-checked:bg-primary/5 has-[>[data-slot=field]]:rounded-lg has-[>[data-slot=field]]:border *:data-[slot=field]:p-2.5 dark:has-data-checked:border-primary/20 dark:has-data-checked:bg-primary/10",
-        "has-[>[data-slot=field]]:w-full has-[>[data-slot=field]]:flex-col",
-        className
-      )}
+      data-size={size}
+      className={cn(fieldLabelVariants({ size }), className)}
       {...props}
     />
   )
@@ -230,9 +260,12 @@ export {
   FieldDescription,
   FieldError,
   FieldGroup,
+  FormFieldGroup,
   FieldLegend,
   FieldSeparator,
   FieldSet,
   FieldContent,
   FieldTitle,
+  fieldLabelVariants,
+  fieldVariants,
 }
